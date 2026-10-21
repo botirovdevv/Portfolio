@@ -1,11 +1,11 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useRef } from "react";
 
 type Props = {
-  photo: string | null;
+  photo: StaticImageData | null;
   name: string;
   initials: string;
   chip: string;
@@ -25,8 +25,9 @@ export function PhotoCard({ photo, name, initials, chip, basedIn, location }: Pr
     cancelAnimationFrame(frame.current);
     frame.current = requestAnimationFrame(() => {
       const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
+      const clamp = (v: number) => Math.max(-0.5, Math.min(0.5, v));
+      const x = clamp((e.clientX - r.left) / r.width - 0.5);
+      const y = clamp((e.clientY - r.top) / r.height - 0.5);
       el.style.transform = `perspective(900px) rotateY(${x * 7}deg) rotateX(${-y * 7}deg)`;
     });
   };
@@ -36,19 +37,29 @@ export function PhotoCard({ photo, name, initials, chip, basedIn, location }: Pr
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-[340px] lg:mx-0 lg:ml-auto">
+    <div
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      className="relative mx-auto w-full max-w-[340px] lg:mx-0 lg:ml-auto"
+    >
       <div
         aria-hidden
-        className="absolute -inset-10 -z-10 rounded-full bg-[radial-gradient(circle,rgba(255,194,75,0.16),transparent_65%)] blur-2xl"
+        className="glow-float absolute -inset-10 -z-10 rounded-full bg-[radial-gradient(circle,rgba(255,194,75,0.16),transparent_65%)] blur-2xl"
       />
       <div
         ref={ref}
-        onPointerMove={onMove}
-        onPointerLeave={onLeave}
-        className="relative aspect-[4/5] overflow-hidden rounded-[22px] border border-white/10 bg-surface shadow-[inset_0_1px_rgba(255,255,255,0.14),0_40px_80px_-40px_rgba(0,0,0,0.9)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] will-change-transform"
+        className="hero-photo tilt-card relative aspect-[4/5] overflow-hidden rounded-[22px] border border-white/10 bg-surface shadow-[inset_0_1px_rgba(255,255,255,0.14),0_40px_80px_-40px_rgba(0,0,0,0.9)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] will-change-transform"
       >
         {photo ? (
-          <Image src={photo} alt={name} fill priority sizes="340px" className="object-cover" />
+          <Image
+            src={photo}
+            alt={name}
+            fill
+            preload
+            placeholder="blur"
+            sizes="(min-width: 400px) 340px, 90vw"
+            className="object-cover object-center"
+          />
         ) : (
           <Placeholder initials={initials} />
         )}

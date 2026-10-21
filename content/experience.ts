@@ -14,6 +14,18 @@ export const experience: ExperienceItem[] = [
   {
     period: "2026 — now",
     current: true,
+    role: { uz: "Asoschi (Founder)", en: "Founder" },
+    org: "Prep-Zone",
+    orgUrl: "https://prep-zone.uz",
+    text: {
+      uz: "SAT va IELTS mock platformasiga asos soldim va uni noldan o'zim yaratdim: g'oya, dizayn, frontend, backend va ishga tushirish. Shu yili FeMate ilovasini ham qurdim.",
+      en: "Founded an SAT and IELTS mock-exam platform and built it from scratch myself: idea, design, frontend, backend and launch. This year I also built the FeMate app.",
+    },
+    tags: ["Next.js", "TypeScript", "Firebase", "AI"],
+  },
+  {
+    period: "2026 — now",
+    current: true,
     role: { uz: "Software Engineering talabasi", en: "Software Engineering student" },
     org: "Al-Khwarizmi University",
     text: {
@@ -25,10 +37,10 @@ export const experience: ExperienceItem[] = [
   {
     period: "2025",
     role: { uz: "Shaxsiy loyihalar", en: "Personal projects" },
-    org: "Prep-Zone, FeMate, ShowRoom AI Pulse",
+    org: "Prep-Zone, ShowRoom AI Pulse",
     text: {
-      uz: "O'z mahsulotlarim ustida ishladim: AI study plan tuzadigan mock platforma, xarajatlarni kamaytiruvchi ilova va avtosalon uchun AI tahlil tizimi.",
-      en: "Worked on my own products: a mock-exam platform with AI study plans, a spending-control app and an AI analytics system for car showrooms.",
+      uz: "O'z mahsulotlarim ustida ishlay boshladim: AI study plan tuzadigan mock platforma g'oyasi va avtosalon uchun AI tahlil tizimi.",
+      en: "Started working on my own products: the idea for a mock-exam platform with AI study plans and an AI analytics system for car showrooms.",
     },
     tags: ["Next.js", "TypeScript", "Firebase", "AI"],
   },

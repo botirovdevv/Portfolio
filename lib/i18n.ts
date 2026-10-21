@@ -23,7 +23,7 @@ const dictionaries = {
       contact: "Aloqa",
     },
     ticker: {
-      label: "NOW",
+      label: "HOZIR",
       live: "ishlab turibdi",
       dev: "ishlanmoqda",
       learning: "o'qish — Software Engineering, 1-kurs",
@@ -48,9 +48,9 @@ const dictionaries = {
     },
     about: {
       kicker: "01 — Men haqimda",
-      title: "Interfeys — mahsulotning yuzi",
+      title: "Men kimman va nima qilaman",
       p1: "Salom! Men Mustafo Botirov — 4 yillik tajribaga ega frontend dasturchiman. Hozirda Al-Xorazmiy nomidagi universitetda Software Engineering yo'nalishida 1-kurs talabasiman.",
-      p2: "Dasturlashni mustaqil o'rgandim va har kuni o'rganishda davom etaman. Ta'lim, sog'liq, moliya va AI yo'nalishidagi real loyihalarda ishlaganman.",
+      p2: "Dasturlashni mustaqil o'rgandim va har kuni o'rganishda davom etaman. SAT va IELTS mock platformasi Prep-Zone asoschisiman — uni noldan o'zim yaratganman. Ta'lim, sog'liq, moliya va AI yo'nalishidagi real loyihalarda ishlaganman.",
       p3: "Men uchun yaxshi interfeys — bu tez yuklanadigan, har qanday ekranda chiroyli ko'rinadigan va foydalanuvchini o'ylashga majburlamaydigan interfeys.",
       status: "Status",
       rows: {
@@ -61,14 +61,14 @@ const dictionaries = {
         study: "Ta'lim",
         studyValue: "Al-Xorazmiy univ.",
         focus: "Fokus",
-        focusValue: "Next.js / UI",
+        focusValue: "Web ilovalar va UI",
         state: "Holat",
         stateValue: "Loyihaga ochiq",
       },
     },
     skills: {
       kicker: "02 — Ko'nikmalar",
-      title: "Texnologiyalar steki",
+      title: "Qaysi texnologiyalarda ishlayman",
       groups: {
         frontend: "Frontend va mobil",
         language: "Tillar",
@@ -78,12 +78,12 @@ const dictionaries = {
     },
     experience: {
       kicker: "03 — Tajriba",
-      title: "Yo'l xaritasi",
+      title: "O'qish va ish tajribam",
       now: "hozirgacha",
     },
     projects: {
       kicker: "04 — Loyihalar",
-      title: "Tanlangan ishlar",
+      title: "Men yaratgan loyihalar",
       details: "Batafsil",
       visit: "Saytni ochish",
       back: "Barcha loyihalar",
@@ -95,7 +95,7 @@ const dictionaries = {
     },
     blog: {
       kicker: "05 — Blog",
-      title: "So'nggi yozuvlar",
+      title: "So'nggi maqolalar",
       all: "Maqolalar",
       read: "O'qish",
       empty: "Hozircha maqolalar yo'q — tez orada birinchisi chiqadi.",
@@ -109,7 +109,7 @@ const dictionaries = {
     },
     contact: {
       kicker: "06 — Aloqa",
-      title: "Keling, zo'r narsa\nquramiz",
+      title: "Men bilan\nbog'laning",
       text: "Loyiha, hamkorlik yoki shunchaki savol — yozing, tez javob beraman.",
     },
     footer: {
@@ -158,9 +158,9 @@ const dictionaries = {
     },
     about: {
       kicker: "01 — About",
-      title: "The interface is the face of a product",
+      title: "Who I am and what I do",
       p1: "Hi! I'm Mustafo Botirov — a frontend developer with 4 years of experience. I'm currently a first-year Software Engineering student at Al-Khwarizmi University.",
-      p2: "I taught myself to code and keep learning every day. I've worked on real products in education, health, finance and AI.",
+      p2: "I taught myself to code and keep learning every day. I'm the founder of Prep-Zone, an SAT and IELTS mock-exam platform I built from scratch myself. I've worked on real products in education, health, finance and AI.",
       p3: "To me, a good interface loads fast, looks great on every screen and never makes people think twice.",
       status: "Status",
       rows: {
@@ -171,14 +171,14 @@ const dictionaries = {
         study: "Education",
         studyValue: "Al-Khwarizmi Univ.",
         focus: "Focus",
-        focusValue: "Next.js / UI",
+        focusValue: "Web apps & UI",
         state: "Status",
         stateValue: "Open to work",
       },
     },
     skills: {
       kicker: "02 — Skills",
-      title: "Tech stack",
+      title: "Technologies I work with",
       groups: {
         frontend: "Frontend & mobile",
         language: "Languages",
@@ -188,12 +188,12 @@ const dictionaries = {
     },
     experience: {
       kicker: "03 — Experience",
-      title: "Roadmap",
+      title: "My learning & work journey",
       now: "present",
     },
     projects: {
       kicker: "04 — Projects",
-      title: "Selected work",
+      title: "Projects I've built",
       details: "Details",
       visit: "Visit site",
       back: "All projects",
@@ -205,7 +205,7 @@ const dictionaries = {
     },
     blog: {
       kicker: "05 — Blog",
-      title: "Latest writing",
+      title: "Latest articles",
       all: "All posts",
       read: "Read",
       empty: "No posts yet — the first one is coming soon.",
@@ -219,7 +219,7 @@ const dictionaries = {
     },
     contact: {
       kicker: "06 — Contact",
-      title: "Let's build\nsomething great",
+      title: "Get in\ntouch",
       text: "A project, a collaboration or just a question — write to me, I reply fast.",
     },
     footer: {

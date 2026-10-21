@@ -4,13 +4,15 @@ import type { Dictionary, Locale } from "@/lib/i18n";
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { allSkills } from "@/content/skills";
+import me from "@/public/me.jpg";
+import { CountUp } from "../ui/count-up";
 import { PhotoCard } from "../ui/photo-card";
 
 export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Locale }) {
   const stats = [
-    { value: `${profile.yearsOfExperience}+`, label: dict.stats.years, accent: true },
-    { value: String(projects.length), label: dict.stats.projects },
-    { value: `${allSkills.length}`, label: dict.stats.stack },
+    { value: profile.yearsOfExperience, suffix: "+", label: dict.stats.years, accent: true },
+    { value: projects.length, label: dict.stats.projects },
+    { value: allSkills.length, label: dict.stats.stack },
   ];
 
   return (
@@ -26,12 +28,12 @@ export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Local
 
       <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-5 sm:px-8 lg:grid-cols-[1fr_340px] lg:gap-10">
         <div>
-          <p className="inline-flex items-center gap-2.5 rounded-full border border-amber/30 bg-amber/[0.06] px-4 py-2 font-mono text-[12.5px] font-medium text-amber">
+          <p style={{ "--i": 0 } as React.CSSProperties} className="hero-in inline-flex items-center gap-2.5 rounded-full border border-amber/30 bg-amber/[0.06] px-4 py-2 font-mono text-[12.5px] font-medium text-amber">
             <span className="live-dot" />
             {dict.badge}
           </p>
 
-          <h1 id="hero-title" className="mt-8">
+          <h1 id="hero-title" style={{ "--i": 1 } as React.CSSProperties} className="hero-in mt-8">
             <span className="block font-display text-[clamp(3.1rem,1.2rem+8.4vw,7rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.055em]">
               {profile.lastName}
             </span>
@@ -41,12 +43,12 @@ export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Local
             <span className="sr-only"> — {dict.role}</span>
           </h1>
 
-          <p className="mt-8 whitespace-pre-line font-display text-[clamp(1.25rem,1rem+1vw,1.75rem)] font-bold leading-[1.15] tracking-[-0.04em]">
+          <p style={{ "--i": 2 } as React.CSSProperties} className="hero-in mt-8 whitespace-pre-line font-display text-[clamp(1.25rem,1rem+1vw,1.75rem)] font-bold leading-[1.15] tracking-[-0.04em]">
             {dict.tagline}
           </p>
-          <p className="mt-5 max-w-[34rem] text-[17px] leading-relaxed text-muted">{dict.intro}</p>
+          <p style={{ "--i": 3 } as React.CSSProperties} className="hero-in mt-5 max-w-[34rem] text-[17px] leading-relaxed text-muted">{dict.intro}</p>
 
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div style={{ "--i": 4 } as React.CSSProperties} className="hero-in mt-9 flex flex-wrap gap-3">
             <Link href={`/${locale}#projects`} className="btn-amber group">
               {dict.ctaProjects}
               <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -60,7 +62,7 @@ export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Local
             </a>
           </div>
 
-          <dl className="mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-line-soft pt-8">
+          <dl style={{ "--i": 5 } as React.CSSProperties} className="hero-in mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-line-soft pt-8">
             {stats.map((s) => (
               <div key={s.label} className="flex flex-col-reverse">
                 <dt className="label-mono mt-2">{s.label}</dt>
@@ -69,7 +71,7 @@ export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Local
                     s.accent ? "text-amber" : ""
                   }`}
                 >
-                  {s.value}
+                  <CountUp to={s.value} suffix={s.suffix} />
                 </dd>
               </div>
             ))}
@@ -77,7 +79,7 @@ export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Local
         </div>
 
         <PhotoCard
-          photo={profile.photo}
+          photo={me}
           name={profile.name}
           initials={profile.initials}
           chip={dict.photoChip}

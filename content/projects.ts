@@ -32,10 +32,10 @@ export const projects: Project[] = [
       en: "An online SAT and IELTS mock platform where AI builds a study plan up to your test date.",
     },
     description: {
-      uz: "Prep-Zone — SAT va IELTS mock imtihonlari platformasi. Foydalanuvchi imtihon kunini belgilaydi, AI esa shu kungacha shaxsiy study plan tuzib beradi — real imtihonga bosqichma-bosqich tayyorlanish uchun.",
-      en: "Prep-Zone is an online mock-exam platform for SAT and IELTS. Users set their test date and AI builds a personal study plan up to that day, so they can prepare for the real exam step by step.",
+      uz: "Prep-Zone — men asos solgan SAT va IELTS mock imtihonlari platformasi. G'oyadan tortib dizayn, frontend, backend va ishga tushirishgacha hammasini o'zim yaratganman. Foydalanuvchi imtihon kunini belgilaydi, AI esa shu kungacha shaxsiy study plan tuzib beradi — real imtihonga bosqichma-bosqich tayyorlanish uchun.",
+      en: "Prep-Zone is an online SAT and IELTS mock-exam platform I founded. I built everything myself — from the idea and design to the frontend, backend and launch. Users set their test date and AI builds a personal study plan up to that day, so they can prepare for the real exam step by step.",
     },
-    role: { uz: "Frontend dasturchi", en: "Frontend developer" },
+    role: { uz: "Asoschi (Founder)", en: "Founder" },
   },
   {
     slug: "xorazmvbsks",
@@ -62,7 +62,7 @@ export const projects: Project[] = [
     monogram: "FM",
     icon: "finance",
     repo: "https://github.com/botirovdevv/shenzhen-fintech",
-    year: "2025",
+    year: "2026",
     status: "dev",
     stack: ["React", "TypeScript", "Firebase", "Tailwind CSS"],
     summary: {

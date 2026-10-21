@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { profile, siteUrl } from "@/content/profile";
 import { fontVariables } from "@/lib/fonts";
@@ -75,6 +76,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           Skip to content
         </a>
         <ScrollProgress />
+        <CardSpotlight />
         <Header locale={locale} nav={dict.nav} menu={dict.menu} ticker={dict.ticker} />
         <main id="main">{children}</main>
         <Footer dict={dict.footer} homeHref={`/${locale}`} />

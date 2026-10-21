@@ -13,7 +13,7 @@ export function Experience({ dict, locale }: { dict: Dictionary["experience"]; l
         <ol className="relative space-y-4 pl-7 sm:pl-9">
           <span aria-hidden className="absolute bottom-6 left-[5px] top-6 w-px bg-gradient-to-b from-amber/60 via-line to-transparent sm:left-[7px]" />
           {experience.map((item, i) => (
-            <Reveal as="li" key={item.period} delay={i * 90} className="relative">
+            <Reveal as="li" key={`${item.period}-${item.org}`} delay={i * 90} className="relative">
               <span
                 aria-hidden
                 className={`absolute -left-7 top-8 size-[11px] rounded-full sm:-left-9 sm:size-[15px] ${
