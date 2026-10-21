@@ -26,7 +26,7 @@ export const projects: Project[] = [
     url: "https://prep-zone.uz",
     year: "2026",
     status: "live",
-    stack: ["Next.js", "TypeScript", "Tailwind CSS", "Firebase"],
+    stack: ["React", "Tailwind CSS", "Firebase"],
     summary: {
       uz: "SAT va IELTS uchun onlayn mock platforma: AI imtihon kuningizgacha shaxsiy study plan tuzadi.",
       en: "An online SAT and IELTS mock platform where AI builds a study plan up to your test date.",
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     name: "FeMate App",
     monogram: "FM",
     icon: "finance",
-    repo: "https://github.com/botirovdevv/shenzhen-fintech",
+    repo: "https://github.com/mustafodevv/shenzhen-fintech",
     year: "2026",
     status: "dev",
     stack: ["React", "TypeScript", "Firebase", "Tailwind CSS"],

@@ -4,7 +4,7 @@ export type ExperienceItem = {
   period: string;
   current?: boolean;
   role: Record<Locale, string>;
-  org: string;
+  org?: string;
   orgUrl?: string;
   text: Record<Locale, string>;
   tags: string[];
@@ -21,7 +21,7 @@ export const experience: ExperienceItem[] = [
       uz: "SAT va IELTS mock platformasiga asos soldim va uni noldan o'zim yaratdim: g'oya, dizayn, frontend, backend va ishga tushirish. Shu yili FeMate ilovasini ham qurdim.",
       en: "Founded an SAT and IELTS mock-exam platform and built it from scratch myself: idea, design, frontend, backend and launch. This year I also built the FeMate app.",
     },
-    tags: ["Next.js", "TypeScript", "Firebase", "AI"],
+    tags: ["React", "Tailwind CSS", "Firebase", "AI"],
   },
   {
     period: "2026 — now",
@@ -37,7 +37,6 @@ export const experience: ExperienceItem[] = [
   {
     period: "2025",
     role: { uz: "Shaxsiy loyihalar", en: "Personal projects" },
-    org: "Prep-Zone, ShowRoom AI Pulse",
     text: {
       uz: "O'z mahsulotlarim ustida ishlay boshladim: AI study plan tuzadigan mock platforma g'oyasi va avtosalon uchun AI tahlil tizimi.",
       en: "Started working on my own products: the idea for a mock-exam platform with AI study plans and an AI analytics system for car showrooms.",

@@ -13,7 +13,7 @@ export function Experience({ dict, locale }: { dict: Dictionary["experience"]; l
         <ol className="relative space-y-4 pl-7 sm:pl-9">
           <span aria-hidden className="absolute bottom-6 left-[5px] top-6 w-px bg-gradient-to-b from-amber/60 via-line to-transparent sm:left-[7px]" />
           {experience.map((item, i) => (
-            <Reveal as="li" key={`${item.period}-${item.org}`} delay={i * 90} className="relative">
+            <Reveal as="li" key={`${item.period}-${item.role.en}`} delay={i * 90} className="relative">
               <span
                 aria-hidden
                 className={`absolute -left-7 top-8 size-[11px] rounded-full sm:-left-9 sm:size-[15px] ${
@@ -24,17 +24,19 @@ export function Experience({ dict, locale }: { dict: Dictionary["experience"]; l
                 <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
                   <div>
                     <h3 className="font-display text-lg font-bold tracking-[-0.03em] sm:text-xl">{item.role[locale]}</h3>
-                    <p className="mt-1.5 flex items-center gap-1.5 text-[14px] text-muted">
-                      <Building2 size={14} strokeWidth={1.8} />
-                      {item.orgUrl ? (
-                        <a href={item.orgUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 hover:text-amber">
-                          {item.org}
-                          <ArrowUpRight size={12} />
-                        </a>
-                      ) : (
-                        item.org
-                      )}
-                    </p>
+                    {item.org && (
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[14px] text-muted">
+                        <Building2 size={14} strokeWidth={1.8} />
+                        {item.orgUrl ? (
+                          <a href={item.orgUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 hover:text-amber">
+                            {item.org}
+                            <ArrowUpRight size={12} />
+                          </a>
+                        ) : (
+                          item.org
+                        )}
+                      </p>
+                    )}
                   </div>
                   <p className={`font-mono text-[12.5px] ${item.current ? "text-amber" : "text-muted-2"}`}>
                     {item.period.replace("now", dict.now)}
