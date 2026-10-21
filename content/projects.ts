@@ -61,7 +61,7 @@ export const projects: Project[] = [
     name: "FeMate App",
     monogram: "FM",
     icon: "finance",
-    repo: "https://github.com/mustafodevv/shenzhen-fintech",
+    repo: "https://github.com/botirovdevv/shenzhen-fintech",
     year: "2026",
     status: "dev",
     stack: ["React", "TypeScript", "Firebase", "Tailwind CSS"],

@@ -18,7 +18,7 @@ export function Logo({ href, onClick }: { href: string; onClick?: () => void }) 
         <path className="logo-mark" pathLength={1} d="M8 22V10l5 7 5-7v12M18 10h3.5a3 3 0 0 1 0 6H18m0 0h4a3 3 0 0 1 0 6h-4" />
       </svg>
       <span className="font-display text-[15px] font-bold tracking-tight">
-        botirov<span className="text-amber">.</span>
+        mustafodev<span className="text-amber">.</span>
       </span>
     </Link>
   );
