@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mustafo Botirov — Portfolio & Blog
 
-## Getting Started
+Next.js 16 (App Router, Cache Components) + Tailwind CSS v4. Ikki tilli (uz / en), SEO optimallashtirilgan,
+blog sayt admin paneli ↔ Telegram bot ↔ Telegram kanal o'rtasida avtomatik sinxronlanadi.
 
-First, run the development server:
+## Ishga tushirish
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # qiymatlarni to'ldiring
+npm install
+npm run dev                  # http://localhost:3000 -> /uz
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Kontentni tahrirlash
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Nima | Fayl |
+| --- | --- |
+| Ism, email, Telegram, GitHub, LinkedIn havolalari | `content/profile.ts` |
+| Loyihalar (tavsif, yil, stack, havola) | `content/projects.ts` |
+| Ko'nikmalar | `content/skills.ts` |
+| Barcha matnlar (uz / en) | `lib/i18n.ts` |
+| Ranglar (midnight + sariq) | `app/globals.css` (`:root` va `[data-theme="dark"]`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Blog qanday ishlaydi
 
-## Learn More
+- **Sayt orqali:** `/admin` → parol → "Yangi post". Saqlanganda post Firestore'ga yoziladi va Telegram kanalga
+  avtomatik yuboriladi. Tahrirlash/o'chirish kanaldagi postni ham yangilaydi (Telegram 48 soatdan eski
+  postlarni o'chirishga ruxsat bermaydi).
+- **Bot orqali:** botga xabar yozing — 1-qator sarlavha, qolgani matn. Rasm + izoh yuborsangiz rasm muqova bo'ladi.
+  Xabarni tahrirlasangiz sayt va kanal ham yangilanadi. Buyruqlar: `/list`, `/delete <slug>`, `/help`.
+- Bot faqat `ADMIN_TELEGRAM_ID` dagi foydalanuvchidan qabul qiladi.
 
-To learn more about Next.js, take a look at the following resources:
+### Sozlash
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Firebase:** console.firebase.google.com → loyiha → Firestore Database yarating →
+   Project settings → Service accounts → *Generate new private key*. JSON'dagi `project_id`, `client_email`,
+   `private_key` ni `.env.local` ga yozing.
+2. **Telegram:** @BotFather → `/newbot` → token. Kanal yarating va botni kanalga **admin** qiling.
+   O'z ID'ingizni @userinfobot dan oling.
+3. **Deploy (Vercel):** env qiymatlarini Vercel Project Settings → Environment Variables ga qo'shing.
+4. **Webhook:** deploydan keyin bir marta:
+   ```bash
+   node --env-file=.env.local scripts/set-webhook.mjs https://sizning-domen.uz
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## SEO
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Har sahifada `title`, `description`, canonical, `hreflang` (uz / en / x-default), Open Graph, Twitter card
+- Dinamik OG rasmlar (`opengraph-image.tsx`), favicon / apple-icon, `manifest.webmanifest`
+- JSON-LD: `Person`, `WebSite`, `BlogPosting`, `BreadcrumbList`, `CreativeWork`
+- `sitemap.xml` (blog postlar bilan, hreflang), `robots.txt`, RSS `feed.xml`
+- Statik prerender + `use cache` (postlar yangilanganda `updateTag` / `revalidateTag`)
+- Google Search Console: `GOOGLE_SITE_VERIFICATION` ni qo'ying va `sitemap.xml` ni yuboring

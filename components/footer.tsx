@@ -1,19 +1,30 @@
 import { cacheLife } from "next/cache";
-import type { Dictionary } from "@/lib/i18n";
 import { profile } from "@/content/profile";
+import type { Dictionary } from "@/lib/i18n";
+import { Logo } from "./logo";
 import { SocialLinks } from "./social-links";
 
-export function Footer({ dict }: { dict: Dictionary["footer"] }) {
+export function Footer({ dict, homeHref }: { dict: Dictionary["footer"]; homeHref: string }) {
   return (
-    <footer className="border-t border-line">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted sm:flex-row sm:px-6">
-        <p>
-          © <Year /> {profile.name}. {dict.rights}
-        </p>
-        <SocialLinks />
-        <p className="font-mono text-xs">
-          {dict.built} <span className="text-accent">▲</span>
-        </p>
+    <footer className="relative overflow-hidden">
+      <div
+        aria-hidden
+        className="text-outline pointer-events-none absolute -bottom-[0.22em] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-display text-[clamp(6rem,22vw,20rem)] font-extrabold leading-none tracking-[-0.06em]"
+      >
+        botirov.
+      </div>
+      <div className="relative mx-auto max-w-[1200px] px-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] sm:px-8">
+        <div className="flex flex-col gap-6 border-t border-line-soft pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Logo href={homeHref} />
+            <p className="font-mono text-[12px] text-muted-2">
+              © <Year /> {profile.name}
+            </p>
+          </div>
+          <SocialLinks />
+        </div>
+        <p className="sr-only">{dict.rights}</p>
+        <div className="h-24 sm:h-40" />
       </div>
     </footer>
   );

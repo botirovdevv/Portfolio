@@ -4,23 +4,19 @@ import "../globals.css";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
-import { SpotlightRoot } from "@/components/ui/spotlight-root";
 import { profile, siteUrl } from "@/content/profile";
 import { fontVariables } from "@/lib/fonts";
 import { getDictionary, isLocale, locales } from "@/lib/i18n";
 import { alternates, JsonLd, openGraph, personJsonLd } from "@/lib/seo";
-import { themeScript } from "@/lib/theme-script";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#070b14" },
-    { media: "(prefers-color-scheme: light)", color: "#f7f6f1" },
-  ],
-  colorScheme: "dark light",
+  themeColor: "#0b0c0e",
+  colorScheme: "dark",
+  viewportFit: "cover",
 };
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
@@ -66,24 +62,22 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const dict = getDictionary(locale);
 
   return (
-    <html lang={locale} data-theme="dark" className={fontVariables} suppressHydrationWarning>
+    <html lang={locale} className={fontVariables}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="alternate" type="application/rss+xml" title={`${profile.name} — Blog`} href="/feed.xml" />
         <JsonLd data={personJsonLd(locale)} />
       </head>
       <body className="min-h-dvh font-sans antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-accent-fill focus:px-4 focus:py-2 focus:text-[#070b14]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-amber focus:px-4 focus:py-2 focus:text-amber-ink"
         >
           Skip to content
         </a>
         <ScrollProgress />
-        <SpotlightRoot />
-        <Header locale={locale} nav={dict.nav} theme={dict.theme} menu={dict.menu} />
+        <Header locale={locale} nav={dict.nav} menu={dict.menu} ticker={dict.ticker} />
         <main id="main">{children}</main>
-        <Footer dict={dict.footer} />
+        <Footer dict={dict.footer} homeHref={`/${locale}`} />
       </body>
     </html>
   );

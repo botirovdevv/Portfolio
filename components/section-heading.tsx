@@ -1,23 +1,26 @@
+import type { ReactNode } from "react";
 import { Reveal } from "./ui/reveal";
 
 export function SectionHeading({
   kicker,
   title,
-  subtitle,
   id,
+  action,
 }: {
   kicker: string;
   title: string;
-  subtitle?: string;
   id: string;
+  action?: ReactNode;
 }) {
   return (
-    <Reveal className="mb-12 max-w-2xl">
-      <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">{kicker}</p>
-      <h2 id={id} className="font-display text-3xl font-bold tracking-tight text-balance sm:text-5xl">
-        {title}
-      </h2>
-      {subtitle && <p className="mt-4 text-lg text-muted">{subtitle}</p>}
+    <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-6 sm:mb-14">
+      <div>
+        <p className="eyebrow">{kicker}</p>
+        <h2 id={id} className="h-section mt-4">
+          {title}
+        </h2>
+      </div>
+      {action}
     </Reveal>
   );
 }

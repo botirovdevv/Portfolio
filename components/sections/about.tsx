@@ -1,66 +1,55 @@
+import { Briefcase, CircleDot, Crosshair, GraduationCap, MapPin } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
-import { profile } from "@/content/profile";
-import { projects } from "@/content/projects";
-import { allSkills } from "@/content/skills";
 import { SectionHeading } from "../section-heading";
 import { Reveal } from "../ui/reveal";
-import { GraduationCap, MapPin, Spark } from "../ui/icons";
 
 export function About({ dict }: { dict: Dictionary["about"] }) {
-  const stats = [
-    { value: `${profile.yearsOfExperience}+`, label: dict.stats.years },
-    { value: `${projects.length}+`, label: dict.stats.projects },
-    { value: `${allSkills.length}`, label: dict.stats.stack },
-  ];
-  const cards = [
-    { Icon: GraduationCap, label: dict.cards.study, value: dict.cards.studyValue, sub: dict.cards.studySub },
-    { Icon: MapPin, label: dict.cards.location, value: dict.cards.locationValue },
-    { Icon: Spark, label: dict.cards.focus, value: dict.cards.focusValue },
+  const r = dict.rows;
+  const rows = [
+    { Icon: Briefcase, label: r.role, value: r.roleValue },
+    { Icon: MapPin, label: r.location, value: r.locationValue },
+    { Icon: GraduationCap, label: r.study, value: r.studyValue },
+    { Icon: Crosshair, label: r.focus, value: r.focusValue },
   ];
 
   return (
-    <section
-      id="about"
-      aria-labelledby="about-title"
-      className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32"
-    >
-      <SectionHeading id="about-title" kicker={dict.kicker} title={dict.title} />
-
-      <div className="grid gap-4 lg:grid-cols-3 lg:grid-rows-3">
-        <Reveal className="spotlight rounded-3xl border border-line bg-elev p-7 sm:p-9 lg:col-span-2 lg:row-span-3">
-          <div className="space-y-5 text-lg leading-relaxed text-muted">
-            <p className="text-fg">{dict.p1}</p>
+    <section id="about" aria-labelledby="about-title" className="mx-auto max-w-[1200px] px-5 py-24 sm:px-8 sm:py-32">
+      <div className="grid gap-12 lg:grid-cols-[1fr_450px] lg:gap-16">
+        <div>
+          <SectionHeading id="about-title" kicker={dict.kicker} title={dict.title} />
+          <Reveal className="max-w-[38rem] space-y-5 text-[17px] leading-[1.75] text-fg-2">
+            <p>{dict.p1}</p>
             <p>{dict.p2}</p>
-            <p>{dict.p3}</p>
-          </div>
-          <dl className="mt-10 grid grid-cols-3 gap-4 border-t border-line pt-8">
-            {stats.map((s) => (
-              <div key={s.label} className="flex flex-col-reverse">
-                <dt className="mt-1 text-sm text-muted">{s.label}</dt>
-                <dd className="font-display text-4xl font-bold text-accent sm:text-5xl">{s.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </Reveal>
-
-        {cards.map(({ Icon, label, value, sub }, i) => (
-          <Reveal
-            key={label}
-            delay={100 * (i + 1)}
-            className="spotlight group rounded-3xl border border-line bg-elev p-6 transition hover:border-accent/50"
-          >
-            <div className="flex items-start gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-fill/15 text-accent transition group-hover:bg-accent-fill group-hover:text-[#070b14]">
-                <Icon />
-              </span>
-              <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-muted">{label}</p>
-                <p className="mt-1.5 font-display text-lg font-semibold">{value}</p>
-                {sub && <p className="mt-0.5 text-sm text-muted">{sub}</p>}
-              </div>
-            </div>
+            <p className="text-muted">{dict.p3}</p>
           </Reveal>
-        ))}
+        </div>
+
+        <Reveal delay={120} className="lg:pt-16">
+          <div className="card-surface rounded-[20px] p-7">
+            <p className="label-mono">{dict.status}</p>
+            <dl className="mt-4">
+              {rows.map(({ Icon, label, value }) => (
+                <div key={label} className="flex items-center justify-between gap-4 border-b border-line-soft py-4">
+                  <dt className="flex items-center gap-3 text-[15px] text-muted">
+                    <Icon size={16} strokeWidth={1.8} className="text-muted-2" />
+                    {label}
+                  </dt>
+                  <dd className="text-right font-mono text-[14px] text-fg">{value}</dd>
+                </div>
+              ))}
+              <div className="flex items-center justify-between gap-4 pt-4">
+                <dt className="flex items-center gap-3 text-[15px] text-muted">
+                  <CircleDot size={16} strokeWidth={1.8} className="text-muted-2" />
+                  {r.state}
+                </dt>
+                <dd className="flex items-center gap-2 font-mono text-[14px] text-amber">
+                  <span className="live-dot" />
+                  {r.stateValue}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

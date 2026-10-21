@@ -38,10 +38,10 @@ export function personJsonLd(locale: Locale) {
         url: siteUrl,
         image: `${siteUrl}/${locale}/opengraph-image`,
         jobTitle: locale === "uz" ? "Frontend dasturchi" : "Frontend Developer",
-        knowsAbout: allSkills,
+        knowsAbout: allSkills.map((s) => s.name),
         alumniOf: { "@type": "CollegeOrUniversity", name: profile.university },
         address: { "@type": "PostalAddress", addressRegion: "Khorezm", addressCountry: "UZ" },
-        sameAs: [profile.github, profile.telegram, profile.linkedin].filter((u) => !u.includes("your_")),
+        sameAs: [profile.github, profile.telegram, profile.linkedin, profile.instagram].filter((u) => !u.includes("your_")),
       },
       {
         "@type": "WebSite",

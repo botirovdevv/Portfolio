@@ -1,121 +1,140 @@
 "use client";
 
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Dictionary, Locale } from "@/lib/i18n";
-import { profile } from "@/content/profile";
-import { Close, Menu } from "./ui/icons";
-import { ThemeToggle } from "./ui/theme-toggle";
+import { locales } from "@/lib/i18n";
+import { Logo } from "./logo";
+import { StatusTicker } from "./status-ticker";
 
 type Props = {
   locale: Locale;
   nav: Dictionary["nav"];
-  theme: Dictionary["theme"];
   menu: Dictionary["menu"];
+  ticker: Dictionary["ticker"];
 };
 
-export function Header({ locale, nav, theme, menu }: Props) {
+const sectionIds = ["about", "skills", "experience", "projects", "blog", "contact"] as const;
+
+export function Header({ locale, nav, menu, ticker }: Props) {
   const pathname = usePathname() ?? `/${locale}`;
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string>("home");
+  const isHome = pathname === `/${locale}`;
 
+  // Scroll-spy: highlight the section currently in view on the home page.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
+    if (!isHome) return;
+    const els = sectionIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    const onScroll = () => window.scrollY < 300 && setActive("home");
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [isHome]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    document.documentElement.style.overflow = open ? "hidden" : "";
   }, [open]);
 
-  const otherLocale: Locale = locale === "uz" ? "en" : "uz";
-  const switchHref = pathname.replace(new RegExp(`^/${locale}(?=/|$)`), `/${otherLocale}`);
+  const current = isHome ? active : pathname.includes("/blog") ? "blog" : pathname.includes("/projects") ? "projects" : "";
 
   const links = [
-    { href: `/${locale}#about`, label: nav.about },
-    { href: `/${locale}#skills`, label: nav.skills },
-    { href: `/${locale}#projects`, label: nav.projects },
-    { href: `/${locale}/blog`, label: nav.blog },
-    { href: `/${locale}#contact`, label: nav.contact },
+    { id: "home", href: `/${locale}`, label: nav.home },
+    { id: "about", href: `/${locale}#about`, label: nav.about },
+    { id: "skills", href: `/${locale}#skills`, label: nav.skills },
+    { id: "experience", href: `/${locale}#experience`, label: nav.experience },
+    { id: "projects", href: `/${locale}#projects`, label: nav.projects },
+    { id: "blog", href: `/${locale}/blog`, label: nav.blog },
   ];
 
+  const localeHref = (l: Locale) => pathname.replace(new RegExp(`^/${locale}(?=/|$)`), `/${l}`);
+
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
-          ? "border-b border-line bg-bg/80 backdrop-blur-xl"
-          : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href={`/${locale}`}
-          className="group flex items-center gap-2.5 font-display text-lg font-bold tracking-tight"
-          onClick={() => setOpen(false)}
-        >
-          <span className="grid size-9 place-items-center rounded-xl bg-accent-fill font-mono text-sm text-[#070b14] transition-transform group-hover:-rotate-6">
-            {profile.initials}
-          </span>
-          <span className="hidden sm:inline">
-            {profile.shortName}
-            <span className="text-accent">.</span>
-          </span>
-        </Link>
+    <header className="fixed inset-x-0 top-0 z-50">
+      <div className="border-b border-line-soft bg-bg-2/75 backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between gap-6 px-5 sm:px-8">
+          <Logo href={`/${locale}`} onClick={() => setOpen(false)} />
 
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex items-center gap-1 rounded-full border border-line bg-elev/60 p-1 backdrop-blur">
-            {links.map((l) => (
-              <li key={l.href}>
+          <nav aria-label="Main" className="hidden lg:block">
+            <ul className="flex items-center gap-7 text-[14.5px]">
+              {links.map((l) => (
+                <li key={l.id}>
+                  <Link
+                    href={l.href}
+                    aria-current={current === l.id ? "true" : undefined}
+                    className={`transition-colors duration-200 ${
+                      current === l.id ? "font-medium text-amber" : "text-fg-2 hover:text-fg"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center rounded-full border border-line bg-white/[0.02] p-1">
+              {locales.map((l) => (
                 <Link
-                  href={l.href}
-                  className="rounded-full px-4 py-1.5 text-sm text-muted transition hover:bg-surface hover:text-fg"
+                  key={l}
+                  href={localeHref(l)}
+                  hrefLang={l}
+                  aria-current={l === locale ? "true" : undefined}
+                  className={`rounded-full px-3 py-1.5 font-mono text-[11px] font-semibold uppercase transition-colors ${
+                    l === locale ? "bg-amber text-amber-ink" : "text-muted hover:text-fg"
+                  }`}
                 >
-                  {l.label}
+                  {l}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href={switchHref}
-            hrefLang={otherLocale}
-            className="grid h-10 min-w-10 place-items-center rounded-full border border-line px-3 font-mono text-xs uppercase text-muted transition hover:border-accent hover:text-accent"
-          >
-            {otherLocale}
-          </Link>
-          <ThemeToggle labels={theme} />
-          <button
-            type="button"
-            className="grid size-10 place-items-center rounded-full border border-line md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-          >
-            <span className="sr-only">{open ? menu.close : menu.open}</span>
-            {open ? <Close /> : <Menu />}
-          </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="grid size-10 place-items-center rounded-xl text-fg-2 transition active:scale-95 lg:hidden"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="mobile-nav"
+              aria-label={open ? menu.close : menu.open}
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </div>
 
+      <StatusTicker dict={ticker} />
+
       <nav
         id="mobile-nav"
+        inert={!open}
         aria-label="Mobile"
-        className={`md:hidden ${open ? "block" : "hidden"} h-[calc(100dvh-4rem)] border-t border-line bg-bg px-4 pt-6`}
+        className={`fixed inset-x-0 bottom-0 top-[72px] overflow-y-auto overscroll-contain bg-bg px-5 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-4 transition-[opacity,transform] duration-300 lg:hidden ${
+          open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
+        }`}
       >
-        <ul className="flex flex-col">
-          {links.map((l, i) => (
-            <li key={l.href}>
+        <ul>
+          {[...links, { id: "contact", href: `/${locale}#contact`, label: nav.contact }].map((l, i) => (
+            <li key={l.id} className="border-b border-line-soft">
               <Link
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="flex items-baseline gap-4 border-b border-line py-5 font-display text-3xl font-bold"
+                className={`flex items-baseline gap-4 py-5 font-display text-2xl font-bold tracking-tight ${
+                  current === l.id ? "text-amber" : ""
+                }`}
               >
-                <span className="font-mono text-xs text-accent">0{i + 1}</span>
+                <span className="font-mono text-[11px] font-medium text-muted-2">{String(i + 1).padStart(2, "0")}</span>
                 {l.label}
               </Link>
             </li>

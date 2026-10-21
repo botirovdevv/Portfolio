@@ -1,21 +1,21 @@
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Golos_Text, JetBrains_Mono, Unbounded } from "next/font/google";
 
-export const inter = Inter({
+export const unbounded = Unbounded({
   subsets: ["latin", "cyrillic"],
-  variable: "--font-inter",
+  variable: "--font-unbounded",
   display: "swap",
 });
 
-export const grotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-grotesk",
+export const golos = Golos_Text({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-golos",
   display: "swap",
 });
 
 export const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   variable: "--font-jetbrains",
   display: "swap",
 });
 
-export const fontVariables = `${inter.variable} ${grotesk.variable} ${jetbrains.variable}`;
+export const fontVariables = `${unbounded.variable} ${golos.variable} ${jetbrains.variable}`;

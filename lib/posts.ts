@@ -64,9 +64,14 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   cacheTag(POSTS_TAG, `post-${slug}`);
   cacheLife("hours");
   if (!isFirebaseConfigured()) return null;
-  const snap = await getDb().collection(COLLECTION).where("slug", "==", slug).limit(1).get();
-  const doc = snap.docs[0];
-  return doc ? toPost(doc.id, doc.data()) : null;
+  try {
+    const snap = await getDb().collection(COLLECTION).where("slug", "==", slug).limit(1).get();
+    const doc = snap.docs[0];
+    return doc ? toPost(doc.id, doc.data()) : null;
+  } catch (err) {
+    console.error("[posts] failed to load post", slug, err);
+    return null;
+  }
 }
 
 /* ---------- Uncached admin reads / writes ---------- */

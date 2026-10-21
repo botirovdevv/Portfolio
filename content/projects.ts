@@ -1,11 +1,16 @@
 import type { Locale } from "@/lib/i18n";
 
-// TODO: har bir loyiha tavsifini haqiqiy ma'lumot bilan almashtiring.
+export type ProjectIcon = "education" | "government" | "health" | "finance" | "ai";
+
 export type Project = {
   slug: string;
   name: string;
+  monogram: string;
+  icon: ProjectIcon;
   url?: string;
+  repo?: string;
   year: string;
+  status: "live" | "dev";
   stack: string[];
   summary: Record<Locale, string>;
   description: Record<Locale, string>;
@@ -16,62 +21,75 @@ export const projects: Project[] = [
   {
     slug: "prep-zone",
     name: "Prep-Zone",
+    monogram: "PZ",
+    icon: "education",
     url: "https://prep-zone.uz",
-    year: "2025",
+    year: "2026",
+    status: "live",
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "Firebase"],
     summary: {
-      uz: "Imtihonlarga tayyorlanish uchun onlayn ta'lim platformasi.",
-      en: "An online learning platform for exam preparation.",
+      uz: "SAT va IELTS uchun onlayn mock platforma: AI imtihon kuningizgacha shaxsiy study plan tuzadi.",
+      en: "An online SAT and IELTS mock platform where AI builds a study plan up to your test date.",
     },
     description: {
-      uz: "Prep-Zone — o'quvchilarga imtihonlarga samarali tayyorlanishda yordam beruvchi platforma: testlar, natijalar tahlili va qulay interfeys.",
-      en: "Prep-Zone helps students prepare for exams effectively with practice tests, progress analytics and a clean interface.",
+      uz: "Prep-Zone — SAT va IELTS mock imtihonlari platformasi. Foydalanuvchi imtihon kunini belgilaydi, AI esa shu kungacha shaxsiy study plan tuzib beradi — real imtihonga bosqichma-bosqich tayyorlanish uchun.",
+      en: "Prep-Zone is an online mock-exam platform for SAT and IELTS. Users set their test date and AI builds a personal study plan up to that day, so they can prepare for the real exam step by step.",
     },
     role: { uz: "Frontend dasturchi", en: "Frontend developer" },
   },
   {
     slug: "xorazmvbsks",
     name: "Xorazm VBSKS",
+    monogram: "XV",
+    icon: "health",
     url: "https://xorazmvbsks.uz",
     year: "2024",
-    stack: ["React.js", "JavaScript", "Sass", "REST API"],
+    status: "live",
+    stack: ["React", "JavaScript", "Sass", "REST API"],
     summary: {
-      uz: "Xorazm viloyati tashkiloti uchun rasmiy veb-sayt.",
-      en: "Official website for a Khorezm regional organization.",
+      uz: "Xorazm viloyat bolalar sil kasalliklari sanatoriyasi uchun rasmiy veb-sayt.",
+      en: "Official website for the Khorezm regional children's tuberculosis sanatorium.",
     },
     description: {
-      uz: "Tashkilot faoliyati, yangiliklar va xizmatlar haqida ma'lumot beruvchi rasmiy sayt. Tez yuklanish va mobil qurilmalarga moslik asosiy e'tiborda.",
-      en: "The official site presenting the organization's activities, news and services, built with a focus on speed and mobile-friendliness.",
+      uz: "Mahalliy mijoz buyurtmasi asosida Bolalar sil kasalliklari sanatoriyasi uchun yaratilgan rasmiy sayt. Loyihada frontend dasturchi sifatida ishladim: sanatoriya faoliyati, yangiliklar va xizmatlar tez yuklanadigan va har qanday qurilmaga mos interfeysda.",
+      en: "An official website built for a children's tuberculosis sanatorium, commissioned by a local client. I worked on it as the frontend developer, presenting the sanatorium's work, news and services in a fast, mobile-friendly interface.",
     },
     role: { uz: "Frontend dasturchi", en: "Frontend developer" },
   },
   {
     slug: "femate",
     name: "FeMate App",
+    monogram: "FM",
+    icon: "finance",
+    repo: "https://github.com/botirovdevv/shenzhen-fintech",
     year: "2025",
+    status: "dev",
     stack: ["React", "TypeScript", "Firebase", "Tailwind CSS"],
     summary: {
-      uz: "Ayollar salomatligi va kundalik hayoti uchun yordamchi ilova.",
-      en: "A companion app for women's health and daily life.",
+      uz: "Kunlik xarajatlarni kamaytirishga yordam beruvchi ilova: AI daromadingizga qarab kunlik limitni hisoblaydi.",
+      en: "An app that helps cut daily spending: AI works out a daily budget from your income.",
     },
     description: {
-      uz: "FeMate — foydalanuvchilarga shaxsiy ma'lumotlarini kuzatish va foydali maslahatlar olishda yordam beruvchi zamonaviy ilova.",
-      en: "FeMate is a modern app that helps users track personal data and receive helpful, personalized tips.",
+      uz: "FeMate — kunlik xarajatlarni kamaytirish uchun yaratilgan ilova. Foydalanuvchi oylik daromadini kiritadi, ilova esa AI yordamida unga mos kunlik xarajatlarni hisoblab beradi.",
+      en: "FeMate is built to help people cut their daily spending. Users enter their monthly income and the app uses AI to calculate how much they can spend each day.",
     },
     role: { uz: "Frontend dasturchi", en: "Frontend developer" },
   },
   {
     slug: "showroompulse-ai",
-    name: "ShowRoomPulse AI",
+    name: "ShowRoom AI Pulse",
+    monogram: "SP",
+    icon: "ai",
     year: "2026",
+    status: "dev",
     stack: ["Next.js", "TypeScript", "Python", "AI API"],
     summary: {
-      uz: "Avtosalonlar uchun AI asosidagi tahlil platformasi.",
-      en: "An AI-powered analytics platform for showrooms.",
+      uz: "Avtosalon uchun AI tahlil: mijozlar qaysi mashina yonida ko'proq turadi va qaysi mashina ko'proq sotiladi.",
+      en: "AI analytics for car showrooms: which cars visitors linger by and which cars sell best.",
     },
     description: {
-      uz: "ShowRoomPulse AI — showroom faoliyatini sun'iy intellekt yordamida tahlil qilib, savdo va mijozlar oqimi bo'yicha aniq xulosalar beradi.",
-      en: "ShowRoomPulse AI uses artificial intelligence to analyze showroom activity and deliver clear insights on sales and customer flow.",
+      uz: "ShowRoom AI Pulse — avtosalonga kelayotgan mijozlarni tahlil qiluvchi tizim. Mijoz qaysi mashina yonida ko'proq turayotgani va qaysi mashina ko'proq sotilayotganini aniqlab, salon uchun foydali xulosalar beradi.",
+      en: "ShowRoom AI Pulse analyzes visitors at a car showroom: it shows which cars people spend the most time next to and which cars sell best, giving the dealership useful insights.",
     },
     role: { uz: "Frontend dasturchi", en: "Frontend developer" },
   },

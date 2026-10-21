@@ -1,139 +1,90 @@
+import { ArrowRight, Send } from "lucide-react";
 import Link from "next/link";
 import type { Dictionary, Locale } from "@/lib/i18n";
 import { profile } from "@/content/profile";
+import { projects } from "@/content/projects";
 import { allSkills } from "@/content/skills";
-import { ArrowRight, ArrowUpRight } from "../ui/icons";
+import { PhotoCard } from "../ui/photo-card";
 
 export function Hero({ dict, locale }: { dict: Dictionary["hero"]; locale: Locale }) {
+  const stats = [
+    { value: `${profile.yearsOfExperience}+`, label: dict.stats.years, accent: true },
+    { value: String(projects.length), label: dict.stats.projects },
+    { value: `${allSkills.length}`, label: dict.stats.stack },
+  ];
+
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 sm:pt-36">
-      <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 -z-10" />
+    <section
+      aria-labelledby="hero-title"
+      className="noise relative overflow-hidden pb-20 pt-[152px] sm:pb-24 sm:pt-[176px]"
+    >
+      <div aria-hidden className="bg-grid grid-fade pointer-events-none absolute inset-0 -z-10 opacity-70" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 -z-10 size-[42rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--glow),transparent_65%)] blur-2xl"
+        className="pointer-events-none absolute -right-40 -top-20 -z-10 size-[44rem] rounded-full bg-[radial-gradient(circle,rgba(255,194,75,0.11),transparent_62%)]"
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.15fr_1fr]">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-16 px-5 sm:px-8 lg:grid-cols-[1fr_340px] lg:gap-10">
         <div>
-          <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-elev/70 px-3 py-1.5 text-xs text-muted backdrop-blur">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
-            </span>
+          <p className="inline-flex items-center gap-2.5 rounded-full border border-amber/30 bg-amber/[0.06] px-4 py-2 font-mono text-[12.5px] font-medium text-amber">
+            <span className="live-dot" />
             {dict.badge}
           </p>
 
-          <h1
-            id="hero-title"
-            className="font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl lg:text-[5.5rem]"
-          >
-            Mustafo
-            <br />
-            <span className="relative inline-block">
-              Botirov
-              <span
-                aria-hidden
-                className="absolute -right-6 bottom-3 size-4 rounded-full bg-accent-fill sm:-right-8 sm:size-5"
-              />
+          <h1 id="hero-title" className="mt-8">
+            <span className="block font-display text-[clamp(3.1rem,1.2rem+8.4vw,7rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.055em]">
+              {profile.lastName}
+            </span>
+            <span className="mt-1 block font-display text-[clamp(1.9rem,1rem+3.6vw,3.3rem)] font-light leading-none tracking-[-0.04em] text-muted">
+              {profile.firstName}
             </span>
             <span className="sr-only"> — {dict.role}</span>
           </h1>
 
-          <p className="mt-6 font-mono text-sm text-accent sm:text-base" aria-hidden>
-            <span className="text-muted">~/</span>
-            {dict.role.toLowerCase().replace(/\s+/g, "-")}
-            <span className="text-muted"> $ </span>
-            <span className="animate-blink">▍</span>
+          <p className="mt-8 whitespace-pre-line font-display text-[clamp(1.25rem,1rem+1vw,1.75rem)] font-bold leading-[1.15] tracking-[-0.04em]">
+            {dict.tagline}
           </p>
-
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">{dict.intro}</p>
+          <p className="mt-5 max-w-[34rem] text-[17px] leading-relaxed text-muted">{dict.intro}</p>
 
           <div className="mt-9 flex flex-wrap gap-3">
-            <Link
-              href={`/${locale}#projects`}
-              className="group inline-flex items-center gap-2 rounded-full bg-accent-fill px-6 py-3 font-semibold text-[#070b14] shadow-[0_8px_30px_-8px_var(--glow)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_40px_-8px_rgba(250,204,21,0.55)]"
-            >
+            <Link href={`/${locale}#projects`} className="btn-amber group">
               {dict.ctaProjects}
-              <ArrowRight className="transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
-            <Link
-              href={`/${locale}#contact`}
-              className="group inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 font-semibold transition hover:border-accent hover:text-accent"
-            >
+            <Link href={`/${locale}#contact`} className="btn-ghost">
               {dict.ctaContact}
-              <ArrowUpRight className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
+            <a href={profile.telegramChannel} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+              <Send size={16} className="text-amber" />
+              {dict.ctaChannel}
+            </a>
           </div>
+
+          <dl className="mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-line-soft pt-8">
+            {stats.map((s) => (
+              <div key={s.label} className="flex flex-col-reverse">
+                <dt className="label-mono mt-2">{s.label}</dt>
+                <dd
+                  className={`font-display text-[2.6rem] font-extrabold leading-none tracking-[-0.05em] sm:text-5xl ${
+                    s.accent ? "text-amber" : ""
+                  }`}
+                >
+                  {s.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <CodeCard />
+        <PhotoCard
+          photo={profile.photo}
+          name={profile.name}
+          initials={profile.initials}
+          chip={dict.photoChip}
+          basedIn={dict.basedIn}
+          location={dict.location}
+        />
       </div>
-
-      <SkillMarquee />
     </section>
-  );
-}
-
-function CodeCard() {
-  const k = "text-[#c792ea]";
-  const s = "text-accent";
-  const v = "text-sky-400";
-  const n = "text-orange-400";
-  const c = "text-muted";
-  return (
-    <div className="relative animate-float">
-      <div
-        aria-hidden
-        className="absolute -inset-4 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_70%_30%,var(--glow),transparent_60%)]"
-      />
-      <div className="overflow-hidden rounded-2xl border border-line bg-elev shadow-2xl shadow-black/20">
-        <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-          <span className="size-3 rounded-full bg-[#ff5f57]" />
-          <span className="size-3 rounded-full bg-[#febc2e]" />
-          <span className="size-3 rounded-full bg-[#28c840]" />
-          <span className="ml-3 font-mono text-xs text-muted">mustafo.ts</span>
-        </div>
-        <pre
-          className="overflow-x-auto p-5 font-mono text-[13px] leading-7 sm:text-sm"
-          aria-label="Developer profile as code"
-        >
-          <code>
-            <span className={c}>{"// hello, world"}</span>
-            {"\n"}
-            <span className={k}>const</span> <span className={v}>developer</span> = {"{"}
-            {"\n  "}name: <span className={s}>&quot;{profile.name}&quot;</span>,
-            {"\n  "}role: <span className={s}>&quot;Frontend Developer&quot;</span>,
-            {"\n  "}experience: <span className={n}>{profile.yearsOfExperience}</span>,
-            {"\n  "}study: <span className={s}>&quot;Software Engineering&quot;</span>,
-            {"\n  "}stack: [<span className={s}>&quot;React&quot;</span>,{" "}
-            <span className={s}>&quot;Next.js&quot;</span>, <span className={s}>&quot;TS&quot;</span>],
-            {"\n  "}coffee: <span className={n}>Infinity</span>,
-            {"\n"}
-            {"};"}
-            {"\n\n"}
-            <span className={k}>export default</span> <span className={v}>developer</span>;
-          </code>
-        </pre>
-      </div>
-    </div>
-  );
-}
-
-function SkillMarquee() {
-  const row = [...allSkills, ...allSkills];
-  return (
-    <div className="relative mt-20 overflow-hidden border-y border-line bg-elev/40 py-5 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)] sm:mt-28">
-      <ul
-        aria-hidden
-        className="flex w-max animate-marquee gap-10 whitespace-nowrap font-display text-xl font-semibold text-muted sm:text-2xl"
-      >
-        {row.map((s, i) => (
-          <li key={i} className="flex items-center gap-10">
-            {s}
-            <span className="text-accent">✦</span>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
