@@ -9,7 +9,7 @@ export function Footer({ dict, homeHref }: { dict: Dictionary["footer"]; homeHre
     <footer className="relative overflow-hidden">
       <div
         aria-hidden
-        className="text-outline pointer-events-none absolute -bottom-[0.22em] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-display text-[clamp(3rem,15vw,14rem)] font-extrabold leading-none tracking-[-0.06em]"
+        className="text-outline pointer-events-none absolute -bottom-[0.22em] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-display text-[clamp(2.5rem,11vw,10rem)] font-extrabold leading-none tracking-[-0.06em]"
       >
         mustafodev.
       </div>
@@ -24,7 +24,7 @@ export function Footer({ dict, homeHref }: { dict: Dictionary["footer"]; homeHre
           <SocialLinks />
         </div>
         <p className="sr-only">{dict.rights}</p>
-        <div className="h-16 sm:h-32" />
+        <div className="h-12 sm:h-24" />
       </div>
     </footer>
   );
