@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${profile.name} — Portfolio`,
     short_name: profile.firstName,
     description: "Frontend developer portfolio & blog",
-    start_url: "/uz",
+    start_url: "/en",
     display: "standalone",
     background_color: "#070611",
     theme_color: "#070611",

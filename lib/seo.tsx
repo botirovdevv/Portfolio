@@ -7,7 +7,7 @@ import { locales, ogLocale, type Locale } from "./i18n";
 export function alternates(locale: Locale, path = ""): Metadata["alternates"] {
   const languages: Record<string, string> = {};
   for (const l of locales) languages[l] = `${siteUrl}/${l}${path}`;
-  languages["x-default"] = `${siteUrl}/uz${path}`;
+  languages["x-default"] = `${siteUrl}/en${path}`;
   return { canonical: `${siteUrl}/${locale}${path}`, languages };
 }
 

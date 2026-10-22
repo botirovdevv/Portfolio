@@ -14,7 +14,7 @@ export default function NotFound() {
         <h1 className="mt-4 font-display text-xl font-bold tracking-tight sm:text-2xl">
           Sahifa topilmadi · Page not found
         </h1>
-        <Link href="/uz" className="btn-amber mt-9">
+        <Link href="/en" className="btn-amber mt-9">
           <ArrowLeft size={17} />
           Bosh sahifa · Home
         </Link>
