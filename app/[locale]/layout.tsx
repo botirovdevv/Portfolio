@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import "../globals.css";
+import { Analytics } from "@/components/analytics";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
@@ -80,6 +82,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <Header locale={locale} nav={dict.nav} menu={dict.menu} ticker={dict.ticker} />
         <main id="main">{children}</main>
         <Footer dict={dict.footer} homeHref={`/${locale}`} />
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   );

@@ -24,6 +24,9 @@ export default function AdminPage({ searchParams }: PageProps<"/admin">) {
           <h1 className="font-display text-2xl font-bold">Blog boshqaruvi</h1>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/admin/analytics" className="rounded-full border border-line px-4 py-2 text-sm hover:border-amber">
+            Analitika
+          </Link>
           <Link href="/uz/blog" className="rounded-full border border-line px-4 py-2 text-sm hover:border-amber">
             Saytni ko&apos;rish
           </Link>
