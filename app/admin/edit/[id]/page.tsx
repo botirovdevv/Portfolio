@@ -3,17 +3,21 @@ import { Suspense } from "react";
 import { requireAdmin } from "@/lib/admin-session";
 import { getPostById } from "@/lib/posts";
 import { updatePost } from "../../actions";
+import { AdminHeader } from "../../admin-header";
 import { PostForm } from "../../post-form";
 
 export default function EditPostPage({ params }: PageProps<"/admin/edit/[id]">) {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-3xl font-bold">Postni tahrirlash</h1>
-      <p className="mt-2 text-muted">O&apos;zgarishlar Telegram kanaldagi postda ham yangilanadi.</p>
-      <Suspense fallback={<p className="mt-8 text-muted">Yuklanmoqda…</p>}>
-        <EditForm params={params} />
-      </Suspense>
-    </div>
+    <>
+      <AdminHeader active="editor" />
+      <main className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">
+        <h1 className="font-display text-3xl font-bold leading-[1.05] sm:text-4xl">Postni tahrirlash</h1>
+        <p className="mt-2 text-muted">O&apos;zgarishlar Telegram kanaldagi postda ham yangilanadi.</p>
+        <Suspense fallback={<div className="group-card mt-8 h-96 animate-pulse" aria-busy="true" aria-label="Yuklanmoqda" />}>
+          <EditForm params={params} />
+        </Suspense>
+      </main>
+    </>
   );
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import type { FormState } from "./actions";
@@ -15,8 +16,14 @@ type Initial = {
 
 const empty: Initial = { title: "", slug: "", excerpt: "", content: "", cover: "", tags: "" };
 
-const field =
-  "mt-2 w-full rounded-xl border border-line bg-bg px-4 py-3 text-base outline-none transition focus:border-amber";
+function Label({ htmlFor, children, hint }: { htmlFor: string; children: React.ReactNode; hint?: string }) {
+  return (
+    <label htmlFor={htmlFor} className="text-sm font-medium">
+      {children}
+      {hint && <span className="font-normal text-muted"> — {hint}</span>}
+    </label>
+  );
+}
 
 export function PostForm({
   action,
@@ -31,78 +38,84 @@ export function PostForm({
   const [content, setContent] = useState(initial.content);
 
   return (
-    <form action={formAction} className="mt-8 grid gap-6">
-      <div>
-        <label htmlFor="title" className="text-sm font-medium">Sarlavha</label>
-        <input id="title" name="title" required defaultValue={initial.title} className={field} />
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2">
+    <form action={formAction} className="mt-8">
+      <p className="section-label">Asosiy</p>
+      <div className="group-card materialize mt-2 grid gap-5 p-5 sm:p-6">
         <div>
-          <label htmlFor="slug" className="text-sm font-medium">
-            URL (slug) <span className="text-muted">— ixtiyoriy</span>
-          </label>
-          <input id="slug" name="slug" defaultValue={initial.slug} placeholder="avtomatik" className={`${field} font-mono`} />
+          <Label htmlFor="title">Sarlavha</Label>
+          <input id="title" name="title" required defaultValue={initial.title} className="field text-lg font-semibold tracking-tight" />
         </div>
+
         <div>
-          <label htmlFor="tags" className="text-sm font-medium">
-            Teglar <span className="text-muted">— vergul bilan</span>
-          </label>
-          <input id="tags" name="tags" defaultValue={initial.tags} placeholder="react, nextjs" className={field} />
+          <div className="flex items-baseline justify-between gap-3">
+            <Label htmlFor="content">Matn (Markdown)</Label>
+            <span className="font-mono text-xs tabular-nums text-muted">{content.length} belgi</span>
+          </div>
+          <textarea
+            id="content"
+            name="content"
+            required
+            rows={18}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={"## Kirish\n\n**qalin**, _kursiv_, `kod`, [havola](https://...)\n\n```js\nconsole.log('salom')\n```"}
+            className="field font-mono text-sm leading-relaxed"
+          />
+          <p className="mt-2 text-xs text-muted">
+            Telegram kanalga sarlavha + matn (4096 belgigacha, rasm bo&apos;lsa 1024) + saytga havola yuboriladi.
+          </p>
         </div>
       </div>
 
-      <div>
-        <label htmlFor="cover" className="text-sm font-medium">
-          Muqova rasmi URL <span className="text-muted">— ixtiyoriy</span>
-        </label>
-        <input id="cover" name="cover" type="text" defaultValue={initial.cover} placeholder="https://…" className={field} />
-      </div>
-
-      <div>
-        <label htmlFor="excerpt" className="text-sm font-medium">
-          Qisqa tavsif (SEO) <span className="text-muted">— bo&apos;sh qolsa matndan olinadi</span>
-        </label>
-        <textarea id="excerpt" name="excerpt" rows={2} maxLength={300} defaultValue={initial.excerpt} className={field} />
-      </div>
-
-      <div>
-        <div className="flex items-baseline justify-between">
-          <label htmlFor="content" className="text-sm font-medium">Matn (Markdown)</label>
-          <span className="font-mono text-xs text-muted">{content.length} belgi</span>
+      <p className="section-label mt-8">Qo&apos;shimcha</p>
+      <div className="group-card materialize-late mt-2 grid gap-5 p-5 sm:p-6">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="slug" hint="ixtiyoriy">URL (slug)</Label>
+            <input id="slug" name="slug" defaultValue={initial.slug} placeholder="avtomatik" className="field font-mono" />
+          </div>
+          <div>
+            <Label htmlFor="tags" hint="vergul bilan">Teglar</Label>
+            <input id="tags" name="tags" defaultValue={initial.tags} placeholder="react, nextjs" className="field" />
+          </div>
         </div>
-        <textarea
-          id="content"
-          name="content"
-          required
-          rows={18}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={"## Kirish\n\n**qalin**, _kursiv_, `kod`, [havola](https://...)\n\n```js\nconsole.log('salom')\n```"}
-          className={`${field} font-mono text-sm leading-relaxed`}
-        />
-        <p className="mt-2 text-xs text-muted">
-          Telegram kanalga sarlavha + matn (4096 belgigacha, rasm bo&apos;lsa 1024) + saytga havola yuboriladi.
+
+        <div>
+          <Label htmlFor="cover" hint="ixtiyoriy">Muqova rasmi URL</Label>
+          <input id="cover" name="cover" type="text" defaultValue={initial.cover} placeholder="https://…" className="field" />
+        </div>
+
+        <div>
+          <Label htmlFor="excerpt" hint="bo'sh qolsa matndan olinadi">Qisqa tavsif (SEO)</Label>
+          <textarea id="excerpt" name="excerpt" rows={2} maxLength={300} defaultValue={initial.excerpt} className="field" />
+        </div>
+      </div>
+
+      {state?.error && (
+        <p role="alert" className="materialize mt-6 flex items-center gap-2.5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <TriangleAlert className="size-4 shrink-0" />
+          {state.error}
         </p>
-      </div>
-
-      {state?.error && <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{state.error}</p>}
+      )}
       {state?.warning && (
-        <p className="rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">
-          {state.warning} — <Link href="/admin" className="underline">ro&apos;yxatga qaytish</Link>
+        <p role="alert" className="materialize mt-6 flex items-start gap-2.5 rounded-2xl border border-amber/25 bg-amber/10 px-4 py-3 text-sm text-amber">
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+          <span>
+            {state.warning} — <Link href="/admin" className="underline">ro&apos;yxatga qaytish</Link>
+          </span>
         </p>
       )}
 
-      <div className="flex gap-3">
-        <button
-          disabled={pending}
-          className="rounded-full bg-amber px-7 py-3 font-semibold text-amber-ink transition hover:brightness-110 disabled:opacity-60"
-        >
-          {pending ? "Saqlanmoqda…" : submitLabel}
-        </button>
-        <Link href="/admin" className="rounded-full border border-line px-6 py-3 text-muted hover:text-fg">
-          Bekor qilish
-        </Link>
+      {/* Floating action bar: stays within reach while writing long posts. */}
+      <div className="sticky bottom-0 z-30 -mx-4 mt-8 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:-mx-6 sm:px-6">
+        <div className="admin-bar !static flex items-center justify-end gap-2 rounded-full border border-white/10 p-1.5 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.8)] after:hidden">
+          <Link href="/admin" className="press btn-quiet h-11 px-5 text-sm !bg-transparent hover:!bg-white/[0.08]">
+            Bekor qilish
+          </Link>
+          <button disabled={pending} className="press btn-primary h-11 px-7">
+            {pending ? "Saqlanmoqda…" : submitLabel}
+          </button>
+        </div>
       </div>
     </form>
   );

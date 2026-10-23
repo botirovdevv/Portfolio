@@ -1,0 +1,214 @@
+/* ---------- Admin panel: materials, press feedback, grouped lists ---------- */
+
+.admin-shell {
+  --glass: rgba(14, 16, 19, 0.72);
+  --group: rgba(255, 255, 255, 0.035);
+  --group-line: rgba(255, 255, 255, 0.07);
+  --spring: cubic-bezier(0.32, 0.72, 0, 1); /* close to a critically damped spring */
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, rgba(255, 194, 75, 0.07), transparent 60%),
+    var(--bg);
+}
+
+/* Translucent chrome: content scrolls under it; a soft edge instead of a hard divider. */
+.admin-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  padding-top: env(safe-area-inset-top);
+}
+.admin-bar::after {
+  content: "";
+  position: absolute;
+  inset: 100% 0 auto;
+  height: 16px;
+  pointer-events: none;
+  background: linear-gradient(var(--glass), transparent);
+}
+
+/* Instant feedback on press — never wait for release. */
+.press {
+  transition:
+    transform 100ms ease-out,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    filter 150ms ease;
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--amber-ink);
+  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 6px 20px -8px rgba(255, 194, 75, 0.55);
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+}
+
+.btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  color: var(--fg-2);
+  background: rgba(255, 255, 255, 0.06);
+}
+.btn-quiet:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fg);
+}
+
+/* Segmented control (iOS-style tabs). */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.segmented > a {
+  border-radius: 999px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.segmented > a:hover {
+  color: var(--fg);
+}
+.segmented > a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--fg);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+}
+
+/* Grouped inset list. */
+.group-card {
+  border-radius: 22px;
+  background: var(--group);
+  border: 1px solid var(--group-line);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -24px rgba(0, 0, 0, 0.6);
+}
+.group-row + .group-row {
+  border-top: 1px solid var(--group-line);
+}
+.group-row {
+  transition: background-color 150ms ease;
+}
+.group-row:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.section-label {
+  padding-inline: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+/* Form fields. */
+.field {
+  margin-top: 0.5rem;
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--group-line);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.8rem 1rem;
+  font-size: 16px;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+.field::placeholder {
+  color: var(--muted-2);
+}
+.field:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.field:focus {
+  border-color: rgba(255, 194, 75, 0.7);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 4px rgba(255, 194, 75, 0.14);
+}
+.field:focus-visible {
+  outline: none;
+}
+
+/* Materialize: surfaces arrive with scale + blur together, not a bare fade. */
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+    filter: blur(6px);
+  }
+}
+.materialize {
+  animation: materialize 420ms var(--spring) both;
+}
+.materialize-late {
+  animation: materialize 420ms 60ms var(--spring) both;
+}
+
+/* Chart bars grow up from their baseline. */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+.bar {
+  transform-origin: bottom;
+  animation: bar-grow 560ms var(--spring) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .materialize,
+  .materialize-late {
+    animation: fade 200ms ease both;
+  }
+  .bar {
+    animation: none;
+  }
+  .press:active:not(:disabled) {
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .admin-bar {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .admin-shell {
+    --group-line: rgba(255, 255, 255, 0.28);
+    --group: var(--surface);
+  }
+}
