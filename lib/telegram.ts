@@ -24,34 +24,6 @@ export async function tg<T = unknown>(method: string, body: Record<string, unkno
   return json.result;
 }
 
-type ChannelChats = { channelId: number; discussionId: number | null };
-let channelChats: Promise<ChannelChats | null> | undefined;
-
-/** The channel's numeric ID and its linked comments group (cached per instance). */
-export function getChannelChats(): Promise<ChannelChats | null> {
-  const channel = process.env.TELEGRAM_CHANNEL_ID;
-  if (!channel) return Promise.resolve(null);
-  channelChats ??= tg<{ id: number; linked_chat_id?: number }>("getChat", { chat_id: channel })
-    .then((c) => ({ channelId: c.id, discussionId: c.linked_chat_id ?? null }))
-    .catch((err) => {
-      channelChats = undefined;
-      throw err;
-    });
-  return channelChats;
-}
-
-let botId: Promise<number> | undefined;
-
-export function getBotId(): Promise<number> {
-  botId ??= tg<{ id: number }>("getMe", {})
-    .then((me) => me.id)
-    .catch((err) => {
-      botId = undefined;
-      throw err;
-    });
-  return botId;
-}
-
 export async function getFileUrl(fileId: string): Promise<string> {
   const file = await tg<{ file_path: string }>("getFile", { file_id: fileId });
   return `${API}/file/bot${token()}/${file.file_path}`;

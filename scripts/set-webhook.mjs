@@ -32,9 +32,6 @@ console.log(
     commands: [
       { command: "list", description: "Oxirgi postlar" },
       { command: "delete", description: "Postni o'chirish: /delete slug" },
-      { command: "people", description: "Alex xotirasi: odamlar va ID'lar" },
-      { command: "remember", description: "Eslab qolish: /remember id ma'lumot" },
-      { command: "forget", description: "Unutish: /forget id" },
       { command: "help", description: "Yordam" },
     ],
   }),
