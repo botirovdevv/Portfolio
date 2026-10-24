@@ -1,4 +1,4 @@
-import { Rss, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/page-hero";
@@ -40,10 +40,6 @@ export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) 
           <a href={profile.telegramChannel} target="_blank" rel="noopener noreferrer" className="btn-amber">
             <Send size={16} />
             {dict.telegram}
-          </a>
-          <a href="/feed.xml" className="btn-ghost">
-            <Rss size={16} className="text-amber" />
-            RSS
           </a>
         </div>
       </Reveal>

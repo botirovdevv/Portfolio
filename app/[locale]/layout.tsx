@@ -67,7 +67,6 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html lang={locale} className={fontVariables}>
       <head>
-        <link rel="alternate" type="application/rss+xml" title={`${profile.name} — Blog`} href="/feed.xml" />
         <JsonLd data={personJsonLd(locale)} />
       </head>
       <body className="min-h-dvh font-sans antialiased">

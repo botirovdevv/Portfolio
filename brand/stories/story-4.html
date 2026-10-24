@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Story 4 — laptop + phone</title>
+<link rel="stylesheet" href="story.css">
+<style>
+  .head { position: absolute; top: 230px; left: 80px; right: 80px; }
+  h1 { margin-top: 44px; font-family: var(--display); font-weight: 800; font-size: 92px; line-height: .98; letter-spacing: -.055em; }
+  h1 em { font-style: normal; color: var(--amber); }
+  .sub { margin-top: 30px; font-size: 36px; line-height: 1.35; color: var(--muted); max-width: 820px; }
+
+  .devices { position: absolute; left: 0; right: 0; top: 800px; height: 800px; }
+
+  /* Laptop: lid + deck, drawn in CSS like the story-1 phone */
+  .laptop { position: absolute; left: 70px; top: 0; width: 860px; transform: rotate(-3deg); transform-origin: 50% 100%; }
+  .lid {
+    position: relative; padding: 22px 22px 26px; border-radius: 34px 34px 10px 10px;
+    background: #16181c; border: 3px solid #34373d;
+    box-shadow: 0 0 0 8px #0c0d10, 0 0 120px -10px rgba(255,194,75,.25);
+  }
+  .lid .cam { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background: #2a2d33; }
+  .lid .screen { position: relative; border-radius: 8px; overflow: hidden; background: var(--bg); }
+
+  /* Site PhotoCard, scaled to the laptop screen; the phone covers most of it */
+  .me {
+    position: absolute; left: 545px; top: 200px; width: 192px; height: 240px;
+    border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 0 60px -6px rgba(255,194,75,.25), 0 24px 44px -24px rgba(0,0,0,.9);
+  }
+  .me img { width: 100%; height: 100%; object-fit: cover; }
+  .me::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.5), transparent 55%); }
+  .me i { position: absolute; width: 20px; height: 20px; z-index: 1; border-color: rgba(255,194,75,.9); border-style: solid; }
+  .me .tl { left: 9px; top: 9px; border-width: 2px 0 0 2px; }
+  .me .br { right: 9px; bottom: 9px; border-width: 0 2px 2px 0; }
+  .me .live {
+    position: absolute; right: 9px; top: 9px; z-index: 1; display: flex; align-items: center; gap: 4px;
+    padding: 3px 7px; border-radius: 99px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.1);
+    font-family: var(--mono); font-size: 7px; font-weight: 600; color: var(--amber);
+  }
+  .me .live::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--amber); }
+  .lid .screen img { display: block; width: 100%; }
+  .deck {
+    position: relative; left: -60px; width: 980px; height: 30px; margin-top: 6px;
+    border-radius: 4px 4px 26px 26px;
+    background: linear-gradient(to bottom, #3a3d43, #1d1f23 45%, #111316);
+    box-shadow: 0 50px 120px -20px rgba(0,0,0,.95);
+  }
+  .deck::before { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 170px; height: 12px; border-radius: 0 0 14px 14px; background: #0c0d10; }
+
+  /* Phone: story-1 phone at ~0.47 scale, in front of the laptop */
+  .phone {
+    position: absolute; left: 720px; top: 170px; width: 284px; height: 586px; z-index: 2;
+    transform: rotate(6deg);
+    border-radius: 44px; padding: 9px; background: #16181c;
+    border: 2px solid #34373d;
+    box-shadow: 0 0 0 6px #0c0d10, 0 50px 110px -10px rgba(0,0,0,.95), 0 0 90px -10px rgba(255,194,75,.3);
+  }
+  .phone .screen { width: 100%; height: 100%; border-radius: 36px; overflow: hidden; position: relative; background: var(--bg); }
+  .phone .screen img { width: 100%; margin-top: 30px; }
+  .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 82px; height: 22px; border-radius: 14px; background: #000; z-index: 2; }
+
+  .foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 560px; z-index: 3;
+    background: linear-gradient(to bottom, transparent, var(--bg) 46%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 30px; padding-bottom: 300px;
+  }
+  .hint { font-family: var(--mono); font-size: 28px; color: var(--muted); letter-spacing: .02em; }
+</style>
+</head>
+<body>
+  <div class="backdrop">
+    <div class="glow" style="width:1400px;height:1400px;left:-160px;top:500px"></div>
+  </div>
+
+  <div class="layer">
+    <div class="head">
+      <span class="badge"><span class="dot"></span>New portfolio is live</span>
+      <h1>Now you can know <em>more</em> about me.</h1>
+      <p class="sub">Projects, experience, stack and blog — all in one place.</p>
+    </div>
+
+    <div class="devices">
+      <div class="laptop">
+        <div class="lid"><span class="cam"></span><div class="screen"><img src="assets/d-hero.png" alt="">
+          <div class="me"><img src="assets/me.jpg" alt=""><i class="tl"></i><i class="br"></i><span class="live">LIVE</span></div>
+        </div></div>
+        <div class="deck"></div>
+      </div>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="assets/m-hero.png" alt=""></div></div>
+    </div>
+
+    <div class="foot">
+      <span class="cta">mustafodev.uz
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </span>
+      <span class="hint">t.me/mustafo_dev</span>
+    </div>
+  </div>
+</body>
+</html>

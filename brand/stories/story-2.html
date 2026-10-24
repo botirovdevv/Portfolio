@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Story 2 — browser</title>
+<link rel="stylesheet" href="story.css">
+<style>
+  .head { position: absolute; top: 240px; left: 80px; right: 80px; }
+  .term { font-family: var(--mono); font-size: 38px; font-weight: 600; color: var(--muted); }
+  .term b { color: var(--amber); font-weight: 700; }
+  .caret { display: inline-block; width: 20px; height: 42px; background: var(--amber); vertical-align: -6px; margin-left: 6px; }
+  h1 { margin-top: 40px; font-family: var(--display); font-weight: 800; font-size: 100px; line-height: .95; letter-spacing: -.055em; }
+  h1 span { display: block; font-weight: 300; color: var(--muted); }
+
+  .win {
+    position: absolute; width: 1140px; border-radius: 30px; overflow: hidden;
+    background: #111316; border: 2px solid #2e3136;
+    box-shadow: 0 50px 120px -20px rgba(0,0,0,.9);
+  }
+  .bar { height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 26px; background: #17191d; border-bottom: 2px solid #26292e; }
+  .bar i { width: 18px; height: 18px; border-radius: 50%; background: #3a3d43; }
+  .bar i:first-child { background: var(--amber); }
+  .url { margin-left: 24px; flex: 0 0 auto; padding: 8px 30px; border-radius: 999px; background: #0c0d10; font-family: var(--mono); font-size: 24px; color: var(--fg); }
+  .url b { color: var(--amber); font-weight: 600; }
+  .win img { display: block; width: 100%; }
+  .crop { height: 640px; overflow: hidden; }
+  .crop img { width: 1560px; max-width: none; margin-left: -150px; }
+  .w-back { width: 900px; left: 230px; top: 720px; transform: rotate(7deg); opacity: .8; }
+  .w-front { width: 960px; left: 40px; top: 900px; transform: rotate(-5deg); box-shadow: 0 50px 120px -20px rgba(0,0,0,.95), 0 0 140px -20px rgba(255,194,75,.22); }
+
+  .foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 640px;
+    background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 40px; padding-bottom: 300px;
+  }
+  .chips { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; padding: 0 60px; }
+  .chips span { font-family: var(--mono); font-size: 28px; color: var(--fg); border: 2px solid var(--line); background: var(--surface); padding: 12px 26px; border-radius: 999px; }
+</style>
+</head>
+<body>
+  <div class="backdrop">
+    <div class="glow" style="width:1200px;height:1200px;right:-420px;top:-260px"></div>
+    <div class="glow" style="width:1000px;height:1000px;left:-300px;top:900px;opacity:.7"></div>
+  </div>
+
+  <div class="layer">
+    <div class="head">
+      <p class="term">&gt; open <b>mustafodev.uz</b><span class="caret"></span></p>
+      <h1>Everything about me<span>in one place.</span></h1>
+    </div>
+
+    <div class="win w-back">
+      <div class="bar"><i></i><i></i><i></i><span class="url"><b>mustafodev.uz</b>/#projects</span></div>
+      <img src="assets/d-projects.png" alt="">
+    </div>
+    <div class="win w-front">
+      <div class="bar"><i></i><i></i><i></i><span class="url"><b>mustafodev.uz</b></span></div>
+      <div class="crop"><img src="assets/d-hero.png" alt=""></div>
+    </div>
+
+    <div class="foot">
+      <div class="chips"><span>About</span><span>Skills</span><span>Experience</span><span>Projects</span><span>Blog</span></div>
+      <div class="logo">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="29" height="29" rx="8" opacity=".4"/><path d="M8 22V10l5 7 5-7v12M18 10h3.5a3 3 0 0 1 0 6H18m0 0h4a3 3 0 0 1 0 6h-4"/></svg>
+        <span>mustafodev<b>.</b></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

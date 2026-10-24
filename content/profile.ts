@@ -14,4 +14,4 @@ export const profile = {
   yearsOfExperience: 4,
 };
 
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://botirov.uz").replace(/\/$/, "");
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://mustafodev.uz").replace(/\/$/, "");

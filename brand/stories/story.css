@@ -1,0 +1,59 @@
+@font-face { font-family: "Unbounded"; font-weight: 200 900; src: url(assets/unbounded.woff2) format("woff2"); }
+@font-face { font-family: "Golos Text"; font-weight: 400 900; src: url(assets/golos.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url(assets/jetbrains.woff2) format("woff2"); }
+
+:root {
+  --bg: #070611;
+  --surface: #0e1013;
+  --line: #2c2f34;
+  --fg: #e8e9ea;
+  --muted: #9aa0a8;
+  --amber: #ffc24b;
+  --ink: #0b0c0e;
+  --display: "Unbounded", sans-serif;
+  --sans: "Golos Text", sans-serif;
+  --mono: "JetBrains Mono", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+body { position: relative; color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+/* Grid + glow backdrop, same language as the site hero */
+.backdrop { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.backdrop::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 30%, transparent 85%);
+}
+.glow { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,194,75,.20), transparent 62%); }
+
+.layer { position: absolute; inset: 0; z-index: 1; }
+
+.logo { display: flex; align-items: center; gap: 22px; font-family: var(--display); font-weight: 700; font-size: 40px; letter-spacing: -.03em; }
+.logo svg { width: 72px; height: 72px; color: var(--amber); }
+.logo b { color: var(--amber); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 18px;
+  border: 2px solid rgba(255,194,75,.35); background: rgba(255,194,75,.07);
+  color: var(--amber); font-family: var(--mono); font-weight: 600; font-size: 30px;
+  padding: 16px 30px; border-radius: 999px;
+}
+.dot { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 8px rgba(255,194,75,.18); }
+
+.kicker { font-family: var(--mono); font-size: 30px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); }
+
+.cta {
+  display: inline-flex; align-items: center; gap: 20px;
+  background: var(--amber); color: var(--ink);
+  font-family: var(--display); font-weight: 700; font-size: 44px; letter-spacing: -.03em;
+  padding: 30px 50px; border-radius: 28px;
+  box-shadow: 0 20px 60px -10px rgba(255,194,75,.45);
+}
+.cta svg { width: 44px; height: 44px; }
+
+.shot { display: block; width: 100%; }
