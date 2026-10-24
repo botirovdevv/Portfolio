@@ -8,14 +8,16 @@ export function isGeminiConfigured() {
 }
 
 const SYSTEM = [
-  `You are the assistant of ${profile.name}, a software developer who runs a Telegram channel and blog.`,
+  `Your name is Alex. You are the assistant of ${profile.name}, a software developer who runs a Telegram channel and blog.`,
   "You reply to comments under the channel's posts on the author's behalf.",
+  `If asked who you are, introduce yourself as Alex, ${profile.firstName}'s assistant.`,
   "Rules:",
   "- Reply in the commenter's language (Uzbek, Russian or English). Uzbek in Latin script.",
   "- Be friendly and concise: 1-3 sentences, no Markdown, no hashtags.",
   "- Base answers on the post and general technical knowledge. Never invent facts about the author, prices or plans.",
   `- If you don't know or the question is personal, say ${profile.firstName} will answer personally.`,
   "- Thanks and praise get a short warm thank-you.",
+  `- When the comment is from ${profile.firstName} himself, talk to him as his assistant: help with his question or idea directly.`,
   "- For spam, insults or meaningless text, output exactly: SKIP",
 ].join("\n");
 
@@ -28,15 +30,18 @@ type ReplyInput = {
   post?: { title: string; content: string } | null;
   comment: string;
   author?: string;
+  /** The comment was written by the channel author. */
+  fromAuthor?: boolean;
   previousReply?: string;
 };
 
 /** Writes a reply to a channel comment; returns null when the model decides not to answer. */
-export async function generateCommentReply({ post, comment, author, previousReply }: ReplyInput) {
+export async function generateCommentReply({ post, comment, author, fromAuthor, previousReply }: ReplyInput) {
+  const from = fromAuthor ? ` from ${profile.firstName} (the author)` : author ? ` from ${author}` : "";
   const prompt = [
     post ? `Post: ${post.title}\n\n${post.content.slice(0, 6000)}` : "Post: (unknown)",
     previousReply ? `Your previous reply in this thread:\n${previousReply}` : "",
-    `Comment${author ? ` from ${author}` : ""}:\n${comment.slice(0, 2000)}`,
+    `Comment${from}:\n${comment.slice(0, 2000)}`,
   ]
     .filter(Boolean)
     .join("\n\n---\n\n");

@@ -195,7 +195,6 @@ async function handleComment(msg: TgMessage) {
   const parent = msg.reply_to_message;
   if (!isGeminiConfigured() || comment.length < 2 || !parent) return;
   if (msg.is_automatic_forward || msg.from?.is_bot || msg.sender_chat) return;
-  if (String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID) return;
   if (msg.chat.id !== (await getDiscussionChatId())) return;
 
   // Answer top-level comments and replies to the bot; stay out of conversations between people.
@@ -215,6 +214,7 @@ async function handleComment(msg: TgMessage) {
     post,
     comment,
     author: msg.from?.first_name,
+    fromAuthor: String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID,
     previousReply: isTopLevel ? undefined : parent.text,
   });
   if (!text) return;

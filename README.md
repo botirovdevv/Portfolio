@@ -30,8 +30,8 @@ npm run dev                  # http://localhost:3000 -> /uz
   Xabarni tahrirlasangiz sayt va kanal ham yangilanadi. Buyruqlar: `/list`, `/delete <slug>`, `/help`.
 - Bot faqat `ADMIN_TELEGRAM_ID` dagi foydalanuvchidan qabul qiladi.
 - **Kommentlarga AI javob:** kanal postlari ostidagi kommentlarga bot Gemini yordamida post mazmuniga mos
-  qisqa javob yozadi. Bot javobiga reply qilinsa, suhbatni davom ettiradi. Muallifning o'z kommentlariga,
-  odamlar orasidagi suhbatga va spamga javob bermaydi. Javob bot nomidan chiqadi.
+  qisqa javob yozadi. Bot o'zini Alex deb tanishtiradi, muallifning o'z kommentlariga ham javob beradi.
+  Bot javobiga reply qilinsa, suhbatni davom ettiradi. Odamlar orasidagi suhbatga va spamga javob bermaydi. Javob bot nomidan chiqadi.
 
 ### Sozlash
 
