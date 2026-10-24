@@ -47,28 +47,33 @@ export async function generateCommentReply({ post, comment, author, previousRepl
     generationConfig: { maxOutputTokens: 2048, temperature: 0.6 },
   });
 
-  // Free-tier models are often overloaded (503) or rate-limited (429); try the next one.
-  const models = [process.env.GEMINI_MODEL || "gemini-3.8-flash", "gemini-2.5-flash"];
+  // Free-tier models are often overloaded (503), slow or rate-limited (429); try the next one.
+  // Flash-lite answers in about a second; the bigger Flash model can hang for a minute under load.
+  const models = [
+    { name: process.env.GEMINI_MODEL || "gemini-3.5-flash-lite", timeout: 20_000 },
+    { name: "gemini-3.8-flash", timeout: 30_000 },
+  ];
+  const failures: string[] = [];
   let json: GeminiResponse = {};
   for (const model of models) {
-    const res = await fetch(`${API}/${model}:generateContent`, {
+    const res = await fetch(`${API}/${model.name}:generateContent`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
       body,
       cache: "no-store",
-      signal: AbortSignal.timeout(40_000),
+      signal: AbortSignal.timeout(model.timeout),
     }).catch((err: Error) => err);
     if (res instanceof Error) {
-      console.warn(`[gemini] ${model} unreachable`, res.message);
+      failures.push(`${model.name}: ${res.message}`);
       continue;
     }
     json = (await res.json()) as GeminiResponse;
     if (res.ok) break;
     if (res.status === 401 || res.status === 403) throw new Error(`Gemini failed: ${json.error?.message ?? res.status}`);
-    console.warn(`[gemini] ${model} ${res.status}: ${json.error?.message}`);
+    failures.push(`${model.name} ${res.status}: ${json.error?.message}`);
     json = {};
   }
-  if (!json.candidates) throw new Error("Gemini is unavailable right now");
+  if (!json.candidates) throw new Error(`Gemini is unavailable right now (${failures.join("; ")})`);
 
   const text = (json.candidates?.[0]?.content?.parts ?? [])
     .filter((p) => !p.thought)
