@@ -51,6 +51,9 @@ function systemFor(fromAuthor: boolean, notes?: string | null) {
 /** Keeps user text from closing our tags early. */
 const untag = (s: string) => s.replace(/<\/?(comment|post|previous_reply)\b[^>]*>/gi, "");
 
+/** Every model is rate-limited, overloaded or timing out; the caller can answer with a canned reply. */
+export class GeminiBusyError extends Error {}
+
 type GeminiResponse = {
   candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[];
   error?: { message: string };
@@ -92,6 +95,7 @@ export async function generateCommentReply({ post, comment, author, fromAuthor, 
     { name: "gemini-3.8-flash", timeout: 30_000 },
   ];
   const failures: string[] = [];
+  let busy = true;
   let json: GeminiResponse = {};
   for (const model of models) {
     const res = await fetch(`${API}/${model.name}:generateContent`, {
@@ -108,10 +112,14 @@ export async function generateCommentReply({ post, comment, author, fromAuthor, 
     json = (await res.json()) as GeminiResponse;
     if (res.ok) break;
     if (res.status === 401 || res.status === 403) throw new Error(`Gemini failed: ${json.error?.message ?? res.status}`);
+    if (res.status !== 429 && res.status < 500) busy = false;
     failures.push(`${model.name} ${res.status}: ${json.error?.message}`);
     json = {};
   }
-  if (!json.candidates) throw new Error(`Gemini is unavailable right now (${failures.join("; ")})`);
+  if (!json.candidates) {
+    const message = `Gemini is unavailable right now (${failures.join("; ")})`;
+    throw busy ? new GeminiBusyError(message) : new Error(message);
+  }
 
   const text = (json.candidates?.[0]?.content?.parts ?? [])
     .filter((p) => !p.thought)

@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { siteUrl } from "@/content/profile";
 import { isFirebaseConfigured } from "@/lib/firebase-admin";
-import { generateCommentReply, isGeminiConfigured } from "@/lib/gemini";
+import { GeminiBusyError, generateCommentReply, isGeminiConfigured } from "@/lib/gemini";
 import { forgetPerson, getPerson, listPeople, rememberPerson, touchCommenter, type Person } from "@/lib/people";
 import {
   findPostByChannelMessageId,
@@ -46,6 +46,8 @@ const HELP = [
   "/forget &lt;id&gt; — unutish",
   "/help — yordam",
 ].join("\n");
+
+const TIRED_REPLY = "Men biroz charchadim, dam olib kelaman 😴 Birozdan keyin yana yozing!";
 
 const reply = (chatId: number, text: string) =>
   tg("sendMessage", {
@@ -298,6 +300,13 @@ async function handleComment(msg: TgMessage) {
     fromAuthor,
     notes,
     previousReply: isTopLevel ? undefined : parent.text,
+  }).catch((err) => {
+    // Free-tier quota or overload: answer in character instead of bothering the admin.
+    if (err instanceof GeminiBusyError) {
+      console.warn("[bot]", err.message);
+      return TIRED_REPLY;
+    }
+    throw err;
   });
   if (!text) return;
   await tg("sendMessage", {
