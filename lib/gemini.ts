@@ -56,8 +56,29 @@ export class GeminiBusyError extends Error {}
 
 type GeminiResponse = {
   candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[];
-  error?: { message: string };
+  error?: { message: string; details?: { retryDelay?: string }[] };
 };
+
+// Each model has its own free-tier quota, so a longer chain means more replies per minute and per day.
+// Flash-lite answers in a few seconds; the bigger models can hang under load, hence the timeouts.
+const MODELS = [
+  { name: process.env.GEMINI_MODEL || "gemini-3.5-flash-lite", timeout: 12_000 },
+  { name: "gemini-3.1-flash-lite", timeout: 12_000 },
+  { name: "gemini-3.5-flash", timeout: 20_000 },
+  { name: "gemma-4-26b-a4b-it", timeout: 20_000 },
+];
+/** Stay well under Telegram's webhook patience, or it retries the update and costs more requests. */
+const DEADLINE = 45_000;
+
+/** Rate-limited models are skipped until their quota resets instead of being asked on every comment. */
+const coolingUntil = new Map<string, number>();
+
+function coolDown(model: string, json: GeminiResponse) {
+  const delay = json.error?.details?.find((d) => d.retryDelay)?.retryDelay;
+  const seconds = delay ? parseFloat(delay) : NaN;
+  // No retryDelay usually means the daily quota is gone; check again in an hour.
+  coolingUntil.set(model, Date.now() + (Number.isFinite(seconds) ? seconds * 1000 : 3_600_000));
+}
 
 type ReplyInput = {
   post?: { title: string; content: string } | null;
@@ -89,21 +110,23 @@ export async function generateCommentReply({ post, comment, author, fromAuthor, 
   });
 
   // Free-tier models are often overloaded (503), slow or rate-limited (429); try the next one.
-  // Flash-lite answers in about a second; the bigger Flash model can hang for a minute under load.
-  const models = [
-    { name: process.env.GEMINI_MODEL || "gemini-3.5-flash-lite", timeout: 20_000 },
-    { name: "gemini-3.8-flash", timeout: 30_000 },
-  ];
+  const started = Date.now();
   const failures: string[] = [];
   let busy = true;
   let json: GeminiResponse = {};
-  for (const model of models) {
+  for (const model of MODELS) {
+    if ((coolingUntil.get(model.name) ?? 0) > Date.now()) {
+      failures.push(`${model.name}: rate-limited`);
+      continue;
+    }
+    const left = DEADLINE - (Date.now() - started);
+    if (left < 3_000) break;
     const res = await fetch(`${API}/${model.name}:generateContent`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY! },
       body,
       cache: "no-store",
-      signal: AbortSignal.timeout(model.timeout),
+      signal: AbortSignal.timeout(Math.min(model.timeout, left)),
     }).catch((err: Error) => err);
     if (res instanceof Error) {
       failures.push(`${model.name}: ${res.message}`);
@@ -112,7 +135,8 @@ export async function generateCommentReply({ post, comment, author, fromAuthor, 
     json = (await res.json()) as GeminiResponse;
     if (res.ok) break;
     if (res.status === 401 || res.status === 403) throw new Error(`Gemini failed: ${json.error?.message ?? res.status}`);
-    if (res.status !== 429 && res.status < 500) busy = false;
+    if (res.status === 429) coolDown(model.name, json);
+    else if (res.status < 500) busy = false;
     failures.push(`${model.name} ${res.status}: ${json.error?.message}`);
     json = {};
   }
