@@ -1,15 +1,26 @@
 import { revalidateTag } from "next/cache";
 import { siteUrl } from "@/content/profile";
 import { isFirebaseConfigured } from "@/lib/firebase-admin";
-import { findPostByTelegramSource, getPublishedPosts, listPostsUncached, POSTS_TAG } from "@/lib/posts";
+import { generateCommentReply, isGeminiConfigured } from "@/lib/gemini";
+import {
+  findPostByChannelMessageId,
+  findPostByTelegramSource,
+  getPublishedPosts,
+  listPostsUncached,
+  POSTS_TAG,
+} from "@/lib/posts";
 import { createAndPublish, deleteEverywhere, postUrl, updateAndSync } from "@/lib/publish";
-import { entitiesToMarkdown, escapeHtml, tg } from "@/lib/telegram";
+import { entitiesToMarkdown, escapeHtml, getBotId, getDiscussionChatId, tg } from "@/lib/telegram";
 
 type TgEntity = { type: string; offset: number; length: number; url?: string; language?: string };
 type TgMessage = {
   message_id: number;
   chat: { id: number; type: string };
-  from?: { id: number };
+  from?: { id: number; is_bot?: boolean; first_name?: string };
+  sender_chat?: { id: number };
+  is_automatic_forward?: boolean;
+  forward_origin?: { type: string; message_id?: number };
+  reply_to_message?: TgMessage;
   text?: string;
   caption?: string;
   entities?: TgEntity[];
@@ -70,7 +81,9 @@ export async function POST(request: Request) {
     await handleUpdate(update);
   } catch (err) {
     console.error("[bot] update failed", err);
-    const chatId = (update.message ?? update.edited_message)?.chat.id;
+    const chat = (update.message ?? update.edited_message)?.chat;
+    // Errors from the comments group go to the admin's DM, not to the public thread.
+    const chatId = chat?.type === "private" ? chat.id : Number(process.env.ADMIN_TELEGRAM_ID) || null;
     if (chatId) await reply(chatId, `⚠️ Xatolik: ${escapeHtml((err as Error).message)}`);
   }
   return Response.json({ ok: true });
@@ -78,7 +91,12 @@ export async function POST(request: Request) {
 
 async function handleUpdate(update: TgUpdate) {
   const msg = update.message ?? update.edited_message;
-  if (!msg || msg.chat.type !== "private") return;
+  if (!msg) return;
+  if (msg.chat.type === "group" || msg.chat.type === "supergroup") {
+    if (update.message) await handleComment(update.message);
+    return;
+  }
+  if (msg.chat.type !== "private") return;
 
   const adminId = process.env.ADMIN_TELEGRAM_ID;
   if (!adminId || String(msg.from?.id) !== adminId) {
@@ -169,6 +187,43 @@ async function handleUpdate(update: TgUpdate) {
     `✅ Joylandi: <a href="${postUrl(post.slug)}">${escapeHtml(post.title)}</a>` +
       (channelError ? `\n⚠️ Kanalga yuborilmadi: ${escapeHtml(channelError)}` : "\n📢 Kanalga ham yuborildi."),
   );
+}
+
+/** Auto-replies to comments under channel posts (in the channel's linked discussion group). */
+async function handleComment(msg: TgMessage) {
+  const comment = (msg.text ?? msg.caption ?? "").trim();
+  const parent = msg.reply_to_message;
+  if (!isGeminiConfigured() || comment.length < 2 || !parent) return;
+  if (msg.is_automatic_forward || msg.from?.is_bot || msg.sender_chat) return;
+  if (String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID) return;
+  if (msg.chat.id !== (await getDiscussionChatId())) return;
+
+  // Answer top-level comments and replies to the bot; stay out of conversations between people.
+  const isTopLevel = Boolean(parent.is_automatic_forward);
+  if (!isTopLevel && parent.from?.id !== (await getBotId())) return;
+
+  let post: { title: string; content: string } | null = null;
+  if (isTopLevel) {
+    const channelMessageId = parent.forward_origin?.message_id;
+    if (channelMessageId && isFirebaseConfigured()) post = await findPostByChannelMessageId(channelMessageId);
+    const rootText = parent.text ?? parent.caption;
+    if (!post && rootText) post = { title: "", content: rootText };
+  }
+
+  await tg("sendChatAction", { chat_id: msg.chat.id, action: "typing" }).catch(() => {});
+  const text = await generateCommentReply({
+    post,
+    comment,
+    author: msg.from?.first_name,
+    previousReply: isTopLevel ? undefined : parent.text,
+  });
+  if (!text) return;
+  await tg("sendMessage", {
+    chat_id: msg.chat.id,
+    text,
+    reply_parameters: { message_id: msg.message_id },
+    link_preview_options: { is_disabled: true },
+  });
 }
 
 // Lets you open /api/telegram/webhook in a browser to check the deployment.

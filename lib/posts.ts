@@ -96,6 +96,16 @@ export async function findPostByTelegramSource(sourceId: string): Promise<Post |
   return doc ? toPost(doc.id, doc.data()) : null;
 }
 
+export async function findPostByChannelMessageId(messageId: number): Promise<Post | null> {
+  const snap = await getDb()
+    .collection(COLLECTION)
+    .where("channelMessageId", "==", messageId)
+    .limit(1)
+    .get();
+  const doc = snap.docs[0];
+  return doc ? toPost(doc.id, doc.data()) : null;
+}
+
 export async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
   const col = getDb().collection(COLLECTION);
   let slug = base;
