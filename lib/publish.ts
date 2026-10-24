@@ -1,5 +1,5 @@
 import "server-only";
-import { siteUrl } from "@/content/profile";
+import { profile, siteUrl } from "@/content/profile";
 import {
   getPostById,
   insertPost,
@@ -49,8 +49,18 @@ function telegramFileId(cover: string | null): string | null {
   return m ? decodeURIComponent(m[1]) : null;
 }
 
+const handle = (url: string) => "@" + url.replace(/\/+$/, "").split("/").pop();
+
+/** Contacts under every channel post. */
+const CHANNEL_FOOTER = [
+  "\n\n➖➖➖➖➖➖",
+  `💬 DM: ${handle(profile.telegram)}`,
+  `📢 Kanal: ${handle(profile.telegramChannel)}`,
+  `📸 <a href="${profile.instagram}">Instagram</a> · 💻 <a href="${profile.github}">GitHub</a> · 🌐 <a href="${siteUrl}">Sayt</a>`,
+].join("\n");
+
 function channelText(post: Post, limit: number) {
-  const link = `\n\n<a href="${postUrl(post.slug)}">🔗 Saytda o'qish →</a>`;
+  const link = `\n\n<a href="${postUrl(post.slug)}">🔗 Saytda o'qish →</a>` + CHANNEL_FOOTER;
   const tags = post.tags.length ? "\n\n" + post.tags.map((t) => `#${t.replace(/\W+/g, "_")}`).join(" ") : "";
   const head = `<b>${escapeHtml(post.title)}</b>\n\n`;
   const budget = limit - head.length - link.length - tags.length - 50;
@@ -102,14 +112,28 @@ async function editInChannel(post: Post) {
   }
 }
 
+/** Sends a saved post to the channel once; a post already there is left alone. */
+export async function publishToChannel(post: Post): Promise<{ post: Post; channelError?: string }> {
+  if (post.channelMessageId) return { post };
+  if (!canPostToChannel()) return { post, channelError: "Telegram kanal sozlanmagan" };
+  try {
+    const msg = await sendToChannel(post);
+    await patchPost(post.id, { channelMessageId: msg.id, channelHasPhoto: msg.photo });
+    return { post: { ...post, channelMessageId: msg.id, channelHasPhoto: msg.photo } };
+  } catch (err) {
+    console.error("[publish] channel send failed", err);
+    return { post, channelError: (err as Error).message };
+  }
+}
+
 export async function createAndPublish(
   input: PostInput,
   source: PostSource,
-  extra: { id?: string; telegramSourceId?: string } = {},
+  extra: { id?: string; telegramSourceId?: string; toChannel?: boolean } = {},
 ): Promise<{ post: Post; channelError?: string }> {
   const now = Date.now();
   const slug = await uniqueSlug(slugify(input.slug || input.title));
-  let post = await insertPost(
+  const post = await insertPost(
     {
       slug,
       title: input.title.trim(),
@@ -127,18 +151,9 @@ export async function createAndPublish(
     extra.id,
   );
 
-  let channelError: string | undefined;
-  if (canPostToChannel()) {
-    try {
-      const msg = await sendToChannel(post);
-      await patchPost(post.id, { channelMessageId: msg.id, channelHasPhoto: msg.photo });
-      post = { ...post, channelMessageId: msg.id, channelHasPhoto: msg.photo };
-    } catch (err) {
-      channelError = (err as Error).message;
-      console.error("[publish] channel send failed", err);
-    }
-  }
-  return { post, channelError };
+  // Without a configured channel the post just stays on the site, as before.
+  if (extra.toChannel === false || !canPostToChannel()) return { post };
+  return publishToChannel(post);
 }
 
 export async function updateAndSync(

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { formatDate } from "@/components/post-card";
 import { ArrowLeft, CalendarDays, Clock3, Hash, Send } from "lucide-react";
 import { PageShell } from "@/components/page-hero";
+import { BrandIcon, type BrandName } from "@/components/ui/brand-icon";
 import { profile, siteUrl } from "@/content/profile";
 import { getDictionary, isLocale, ogLocale } from "@/lib/i18n";
 import { renderMarkdown } from "@/lib/markdown";
@@ -50,6 +51,13 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
   if (!post) notFound();
   const dict = getDictionary(locale).blog;
   const url = `${siteUrl}/${locale}/blog/${post.slug}`;
+  // Where readers can reach the author, shown under every post next to the DM button.
+  const contacts: { href: string; label: string; icon: BrandName }[] = [
+    { href: profile.telegramChannel, label: dict.telegram, icon: "telegram" },
+    { href: profile.instagram, label: "Instagram", icon: "instagram" },
+    { href: profile.github, label: "GitHub", icon: "github" },
+    { href: profile.linkedin, label: "LinkedIn", icon: "linkedin" },
+  ];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -126,7 +134,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
 
         <div className="prose-post mt-10" dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
 
-        <footer className="card-surface mt-16 flex flex-col items-start justify-between gap-5 rounded-[20px] p-6 sm:flex-row sm:items-center">
+        <footer className="card-surface mt-16 rounded-[20px] p-6">
           <div className="flex items-center gap-4">
             <span className="grid size-12 place-items-center rounded-xl border border-amber/40 bg-amber/10 font-display text-sm font-extrabold text-amber">
               {profile.initials}
@@ -136,10 +144,19 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
               <p className="text-sm text-muted">{getDictionary(locale).hero.role}</p>
             </div>
           </div>
-          <a href={profile.telegramChannel} target="_blank" rel="noopener noreferrer" className="btn-amber">
-            <Send size={16} />
-            {dict.telegram}
-          </a>
+          <p className="mt-6 border-t border-line-soft pt-5 text-sm text-muted">{dict.contactTitle}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a href={profile.telegram} target="_blank" rel="noopener noreferrer" className="btn-amber">
+              <Send size={16} />
+              {dict.dm}
+            </a>
+            {contacts.map(({ href, label, icon }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer me" className="btn-ghost">
+                <BrandIcon name={icon} />
+                {label}
+              </a>
+            ))}
+          </div>
         </footer>
       </article>
     </PageShell>

@@ -1,8 +1,8 @@
 import { revalidateTag } from "next/cache";
 import { siteUrl } from "@/content/profile";
 import { isFirebaseConfigured } from "@/lib/firebase-admin";
-import { findPostByTelegramSource, getPublishedPosts, listPostsUncached, POSTS_TAG } from "@/lib/posts";
-import { createAndPublish, deleteEverywhere, postUrl, updateAndSync } from "@/lib/publish";
+import { findPostByTelegramSource, getPostById, getPublishedPosts, listPostsUncached, POSTS_TAG } from "@/lib/posts";
+import { createAndPublish, deleteEverywhere, postUrl, publishToChannel, updateAndSync } from "@/lib/publish";
 import { entitiesToMarkdown, escapeHtml, tg } from "@/lib/telegram";
 
 type TgEntity = { type: string; offset: number; length: number; url?: string; language?: string };
@@ -16,12 +16,14 @@ type TgMessage = {
   caption_entities?: TgEntity[];
   photo?: { file_id: string; width: number; height: number }[];
 };
-type TgUpdate = { update_id: number; message?: TgMessage; edited_message?: TgMessage };
+type TgCallbackQuery = { id: string; from: { id: number }; message?: TgMessage; data?: string };
+type TgUpdate = { update_id: number; message?: TgMessage; edited_message?: TgMessage; callback_query?: TgCallbackQuery };
 
 const HELP = [
   "<b>Blog bot</b> — saytga va kanalga post joylash.",
   "",
   "📝 <b>Yangi post:</b> xabar yuboring. Birinchi qator — sarlavha, qolgani — matn.",
+  "📢 Post saytga joylangach, kanalga ham yuborish-yubormaslikni so'rayman.",
   "🖼 Rasm + izoh (caption) yuborsangiz, rasm muqova bo'ladi.",
   "✏️ Yuborgan xabaringizni tahrirlasangiz — sayt va kanaldagi post ham yangilanadi.",
   "",
@@ -46,9 +48,11 @@ function parseMessage(msg: TgMessage) {
   const nl = md.indexOf("\n");
   if (nl === -1) return null;
   const title = md.slice(0, nl).replace(/[*_~`]/g, "").trim();
-  const content = md.slice(nl + 1).trim();
+  const body = md.slice(nl + 1).trim();
+  const tags = Array.from(body.matchAll(/(?:^|\s)#([\p{L}\d_]+)/gu), (m) => m[1]);
+  // A closing line of only hashtags becomes tags; the channel post prints them once at the end.
+  const content = body.replace(/\n+(?:#[\p{L}\d_]+[ \t]*)+$/u, "").trim();
   if (!title || !content) return null;
-  const tags = Array.from(content.matchAll(/(?:^|\s)#([\p{L}\d_]+)/gu), (m) => m[1]);
   const photo = msg.photo?.at(-1);
   return {
     title,
@@ -70,8 +74,7 @@ export async function POST(request: Request) {
     await handleUpdate(update);
   } catch (err) {
     console.error("[bot] update failed", err);
-    const chat = (update.message ?? update.edited_message)?.chat;
-    // Errors from the comments group go to the admin's DM, not to the public thread.
+    const chat = (update.message ?? update.edited_message ?? update.callback_query?.message)?.chat;
     const chatId = chat?.type === "private" ? chat.id : Number(process.env.ADMIN_TELEGRAM_ID) || null;
     if (chatId) await reply(chatId, `⚠️ Xatolik: ${escapeHtml((err as Error).message)}`);
   }
@@ -79,6 +82,7 @@ export async function POST(request: Request) {
 }
 
 async function handleUpdate(update: TgUpdate) {
+  if (update.callback_query) return handleChannelChoice(update.callback_query);
   const msg = update.message ?? update.edited_message;
   if (!msg) return;
   if (msg.chat.type !== "private") return;
@@ -162,16 +166,54 @@ async function handleUpdate(update: TgUpdate) {
     return;
   }
 
-  const { post, channelError } = await createAndPublish(parsed, "telegram", {
+  const { post } = await createAndPublish(parsed, "telegram", {
     id: `tg-${msg.chat.id}-${msg.message_id}`,
     telegramSourceId: sourceId,
+    toChannel: false,
   });
   revalidateTag(POSTS_TAG, { expire: 0 });
-  await reply(
-    msg.chat.id,
-    `✅ Joylandi: <a href="${postUrl(post.slug)}">${escapeHtml(post.title)}</a>` +
-      (channelError ? `\n⚠️ Kanalga yuborilmadi: ${escapeHtml(channelError)}` : "\n📢 Kanalga ham yuborildi."),
-  );
+  await tg("sendMessage", {
+    chat_id: msg.chat.id,
+    text: `✅ Saytga joylandi: <a href="${postUrl(post.slug)}">${escapeHtml(post.title)}</a>\n\nTelegram kanalga ham yuborilsinmi?`,
+    parse_mode: "HTML",
+    link_preview_options: { is_disabled: true },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "✅ Ha, yuborilsin", callback_data: `ch:yes:${post.id}` },
+          { text: "❌ Yo'q", callback_data: `ch:no:${post.id}` },
+        ],
+      ],
+    },
+  });
+}
+
+/** Answers the "send to the channel too?" buttons shown after a post is published on the site. */
+async function handleChannelChoice(query: TgCallbackQuery) {
+  await tg("answerCallbackQuery", { callback_query_id: query.id }).catch(() => {});
+  const m = query.data?.match(/^ch:(yes|no):(.+)$/);
+  const msg = query.message;
+  if (!m || !msg || String(query.from.id) !== process.env.ADMIN_TELEGRAM_ID) return;
+
+  const found = await getPostById(m[2]);
+  let text = "Bu post endi mavjud emas.";
+  if (found) {
+    const head = `✅ Saytga joylandi: <a href="${postUrl(found.slug)}">${escapeHtml(found.title)}</a>\n`;
+    if (m[1] === "no") {
+      text = head + "🌐 Faqat saytda.";
+    } else {
+      const { channelError } = await publishToChannel(found);
+      text = head + (channelError ? `⚠️ Kanalga yuborilmadi: ${escapeHtml(channelError)}` : "📢 Kanalga ham yuborildi.");
+    }
+  }
+  // Replacing the text also removes the buttons, so a second tap can't post twice.
+  await tg("editMessageText", {
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+    text,
+    parse_mode: "HTML",
+    link_preview_options: { is_disabled: true },
+  });
 }
 
 /** The bot is private: strangers are turned away, and the admin hears about every /start. */

@@ -29,10 +29,13 @@ export function PostForm({
   action,
   initial = empty,
   submitLabel,
+  channelOption = false,
 }: {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   initial?: Initial;
   submitLabel: string;
+  /** New posts let the author choose whether the post also goes to the Telegram channel. */
+  channelOption?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const [content, setContent] = useState(initial.content);
@@ -90,6 +93,16 @@ export function PostForm({
           <textarea id="excerpt" name="excerpt" rows={2} maxLength={300} defaultValue={initial.excerpt} className="field" />
         </div>
       </div>
+
+      {channelOption && (
+        <label className="group-card materialize-late mt-8 flex cursor-pointer items-center gap-3 p-5 sm:p-6">
+          <input type="checkbox" name="toChannel" defaultChecked className="size-5 shrink-0 accent-amber" />
+          <span>
+            <span className="block text-sm font-medium">Telegram kanalga ham yuborish</span>
+            <span className="block text-xs text-muted">Belgilanmasa, post faqat saytda chiqadi.</span>
+          </span>
+        </label>
+      )}
 
       {state?.error && (
         <p role="alert" className="materialize mt-6 flex items-center gap-2.5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">

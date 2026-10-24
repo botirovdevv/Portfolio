@@ -53,7 +53,8 @@ export async function createPost(_: FormState, formData: FormData): Promise<Form
   const error = validate(input);
   if (error) return { error };
 
-  const { channelError } = await createAndPublish(input, "web");
+  const toChannel = formData.get("toChannel") === "on";
+  const { channelError } = await createAndPublish(input, "web", { toChannel });
   updateTag(POSTS_TAG);
   if (channelError) return { warning: `Saytga saqlandi, lekin kanalga yuborilmadi: ${channelError}` };
   redirect("/admin?ok=created");

@@ -6,6 +6,7 @@ import {
   siGit,
   siGithub,
   siHtml5,
+  siInstagram,
   siJavascript,
   siNextdotjs,
   siNodedotjs,
@@ -39,6 +40,7 @@ const icons = {
   node: siNodedotjs,
   git: siGit,
   github: siGithub,
+  instagram: siInstagram,
   telegram: siTelegram,
   linkedin: siLinkedin,
 } as const;
