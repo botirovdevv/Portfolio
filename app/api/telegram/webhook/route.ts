@@ -10,7 +10,7 @@ import {
   POSTS_TAG,
 } from "@/lib/posts";
 import { createAndPublish, deleteEverywhere, postUrl, updateAndSync } from "@/lib/publish";
-import { entitiesToMarkdown, escapeHtml, getBotId, getDiscussionChatId, tg } from "@/lib/telegram";
+import { entitiesToMarkdown, escapeHtml, getBotId, getChannelChats, tg } from "@/lib/telegram";
 
 type TgEntity = { type: string; offset: number; length: number; url?: string; language?: string };
 type TgMessage = {
@@ -194,8 +194,14 @@ async function handleComment(msg: TgMessage) {
   const comment = (msg.text ?? msg.caption ?? "").trim();
   const parent = msg.reply_to_message;
   if (!isGeminiConfigured() || comment.length < 2 || !parent) return;
-  if (msg.is_automatic_forward || msg.from?.is_bot || msg.sender_chat) return;
-  if (msg.chat.id !== (await getDiscussionChatId())) return;
+  if (msg.is_automatic_forward) return;
+  const chats = await getChannelChats();
+  if (!chats || msg.chat.id !== chats.discussionId) return;
+
+  // Comments posted as the channel or as the group (anonymous admin) count as the author's.
+  // Telegram sends those with a service bot in `from`, so check sender_chat before is_bot.
+  const asOwnChat = msg.sender_chat?.id === chats.channelId || msg.sender_chat?.id === msg.chat.id;
+  if (msg.sender_chat ? !asOwnChat : msg.from?.is_bot) return;
 
   // Answer top-level comments and replies to the bot; stay out of conversations between people.
   const isTopLevel = Boolean(parent.is_automatic_forward);
@@ -214,7 +220,7 @@ async function handleComment(msg: TgMessage) {
     post,
     comment,
     author: msg.from?.first_name,
-    fromAuthor: String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID,
+    fromAuthor: asOwnChat || String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID,
     previousReply: isTopLevel ? undefined : parent.text,
   });
   if (!text) return;

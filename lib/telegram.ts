@@ -24,19 +24,20 @@ export async function tg<T = unknown>(method: string, body: Record<string, unkno
   return json.result;
 }
 
-let discussionChatId: Promise<number | null> | undefined;
+type ChannelChats = { channelId: number; discussionId: number | null };
+let channelChats: Promise<ChannelChats | null> | undefined;
 
-/** The channel's linked comments group (cached per instance). */
-export function getDiscussionChatId(): Promise<number | null> {
+/** The channel's numeric ID and its linked comments group (cached per instance). */
+export function getChannelChats(): Promise<ChannelChats | null> {
   const channel = process.env.TELEGRAM_CHANNEL_ID;
   if (!channel) return Promise.resolve(null);
-  discussionChatId ??= tg<{ linked_chat_id?: number }>("getChat", { chat_id: channel })
-    .then((c) => c.linked_chat_id ?? null)
+  channelChats ??= tg<{ id: number; linked_chat_id?: number }>("getChat", { chat_id: channel })
+    .then((c) => ({ channelId: c.id, discussionId: c.linked_chat_id ?? null }))
     .catch((err) => {
-      discussionChatId = undefined;
+      channelChats = undefined;
       throw err;
     });
-  return discussionChatId;
+  return channelChats;
 }
 
 let botId: Promise<number> | undefined;
