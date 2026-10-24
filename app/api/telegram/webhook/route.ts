@@ -2,6 +2,7 @@ import { revalidateTag } from "next/cache";
 import { siteUrl } from "@/content/profile";
 import { isFirebaseConfigured } from "@/lib/firebase-admin";
 import { generateCommentReply, isGeminiConfigured } from "@/lib/gemini";
+import { forgetPerson, getPerson, listPeople, rememberPerson, touchCommenter, type Person } from "@/lib/people";
 import {
   findPostByChannelMessageId,
   findPostByTelegramSource,
@@ -16,7 +17,7 @@ type TgEntity = { type: string; offset: number; length: number; url?: string; la
 type TgMessage = {
   message_id: number;
   chat: { id: number; type: string };
-  from?: { id: number; is_bot?: boolean; first_name?: string };
+  from?: { id: number; is_bot?: boolean; first_name?: string; last_name?: string; username?: string };
   sender_chat?: { id: number };
   is_automatic_forward?: boolean;
   forward_origin?: { type: string; message_id?: number };
@@ -38,6 +39,11 @@ const HELP = [
   "",
   "/list — oxirgi postlar",
   "/delete &lt;slug&gt; — postni o'chirish",
+  "",
+  "🧠 <b>Alex xotirasi</b> (kommentlarga javob berishda ishlatiladi):",
+  "/people — eslab qolinganlar va oxirgi kommentatorlar (ID bilan)",
+  "/remember &lt;id&gt; &lt;ma'lumot&gt; — odamni eslab qolish",
+  "/forget &lt;id&gt; — unutish",
   "/help — yordam",
 ].join("\n");
 
@@ -100,7 +106,7 @@ async function handleUpdate(update: TgUpdate) {
 
   const adminId = process.env.ADMIN_TELEGRAM_ID;
   if (!adminId || String(msg.from?.id) !== adminId) {
-    await reply(msg.chat.id, "Bu bot shaxsiy blog uchun. 🙂");
+    if (update.message) await handleStranger(update.message, adminId);
     return;
   }
   if (!isFirebaseConfigured()) {
@@ -163,6 +169,46 @@ async function handleUpdate(update: TgUpdate) {
     return;
   }
 
+  if (text === "/people") {
+    const { known, recent } = await listPeople();
+    const line = (p: Person) =>
+      `• ${escapeHtml(p.firstName ?? "—")}${p.username ? ` @${p.username}` : ""} — <code>${p.id}</code>`;
+    const parts = [
+      known.length
+        ? "🧠 <b>Eslab qolinganlar:</b>\n" +
+          known.map((p) => `${line(p)}\n   <i>${escapeHtml((p.notes ?? "").slice(0, 200))}</i>`).join("\n")
+        : "🧠 Hali hech kim eslab qolinmagan.",
+      recent.length ? "💬 <b>Oxirgi kommentatorlar:</b>\n" + recent.map(line).join("\n") : "",
+      "Eslab qolish: /remember &lt;id&gt; &lt;ma'lumot&gt;",
+    ];
+    await reply(msg.chat.id, parts.filter(Boolean).join("\n\n"));
+    return;
+  }
+
+  if (text.startsWith("/remember")) {
+    const m = text.match(/^\/remember(?:@\w+)?\s+(\d+)\s+([\s\S]+)$/);
+    if (!m) {
+      await reply(
+        msg.chat.id,
+        "Foydalanish: /remember &lt;id&gt; &lt;ma'lumot&gt;\nMasalan: <code>/remember 123456789 Ismi Ali, \"Ali aka\" deb chaqir, do'stim</code>\nID'ni /people dan oling.",
+      );
+      return;
+    }
+    await rememberPerson(m[1], m[2].trim());
+    await reply(msg.chat.id, `✅ Saqlandi: <code>${m[1]}</code>\n<i>${escapeHtml(m[2].trim())}</i>`);
+    return;
+  }
+
+  if (text.startsWith("/forget")) {
+    const id = text.split(/\s+/)[1];
+    if (!id || !/^\d+$/.test(id)) {
+      await reply(msg.chat.id, "Foydalanish: /forget &lt;id&gt;");
+      return;
+    }
+    await reply(msg.chat.id, (await forgetPerson(id)) ? `🗑 Unutildi: <code>${id}</code>` : "Bu ID bo'yicha ma'lumot yo'q.");
+    return;
+  }
+
   if (text.startsWith("/")) {
     await reply(msg.chat.id, "Noma'lum buyruq. /help");
     return;
@@ -186,6 +232,24 @@ async function handleUpdate(update: TgUpdate) {
     msg.chat.id,
     `✅ Joylandi: <a href="${postUrl(post.slug)}">${escapeHtml(post.title)}</a>` +
       (channelError ? `\n⚠️ Kanalga yuborilmadi: ${escapeHtml(channelError)}` : "\n📢 Kanalga ham yuborildi."),
+  );
+}
+
+/** The bot is private: strangers are turned away, and the admin hears about every /start. */
+async function handleStranger(msg: TgMessage, adminId: string | undefined) {
+  await reply(msg.chat.id, "⛔ Siz admin emassiz. Bu bot faqat egasi uchun ishlaydi.");
+  const text = (msg.text ?? "").trim();
+  if (!adminId || !msg.from || !/^\/start\b/.test(text)) return;
+  const u = msg.from;
+  const name = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
+  await reply(
+    Number(adminId),
+    [
+      "👤 <b>Botga start bosildi</b>",
+      `Ism: <a href="tg://user?id=${u.id}">${escapeHtml(name)}</a>`,
+      u.username ? `Username: @${u.username}` : "Username: yo'q",
+      `ID: <code>${u.id}</code>`,
+    ].join("\n"),
   );
 }
 
@@ -215,12 +279,24 @@ async function handleComment(msg: TgMessage) {
     if (!post && rootText) post = { title: "", content: rootText };
   }
 
+  const fromAuthor = asOwnChat || String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID;
+  let notes: string | null = null;
+  if (!fromAuthor && msg.from && isFirebaseConfigured()) {
+    // Memory is a nice-to-have; never let a Firestore hiccup block the reply.
+    const [person] = await Promise.all([
+      getPerson(msg.from.id).catch(() => null),
+      touchCommenter(msg.from).catch((err) => console.warn("[bot] touchCommenter failed", err)),
+    ]);
+    notes = person?.notes ?? null;
+  }
+
   await tg("sendChatAction", { chat_id: msg.chat.id, action: "typing" }).catch(() => {});
   const text = await generateCommentReply({
     post,
     comment,
     author: msg.from?.first_name,
-    fromAuthor: asOwnChat || String(msg.from?.id) === process.env.ADMIN_TELEGRAM_ID,
+    fromAuthor,
+    notes,
     previousReply: isTopLevel ? undefined : parent.text,
   });
   if (!text) return;

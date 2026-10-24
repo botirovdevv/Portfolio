@@ -23,11 +23,18 @@ console.log(
     drop_pending_updates: true,
   }),
 );
+// The bot is private: only the admin's chat gets the command menu.
+const adminId = process.env.ADMIN_TELEGRAM_ID;
+console.log(await api("deleteMyCommands", {}));
 console.log(
   await api("setMyCommands", {
+    ...(adminId && { scope: { type: "chat", chat_id: Number(adminId) } }),
     commands: [
       { command: "list", description: "Oxirgi postlar" },
       { command: "delete", description: "Postni o'chirish: /delete slug" },
+      { command: "people", description: "Alex xotirasi: odamlar va ID'lar" },
+      { command: "remember", description: "Eslab qolish: /remember id ma'lumot" },
+      { command: "forget", description: "Unutish: /forget id" },
       { command: "help", description: "Yordam" },
     ],
   }),

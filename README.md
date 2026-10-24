@@ -28,7 +28,11 @@ npm run dev                  # http://localhost:3000 -> /uz
   postlarni o'chirishga ruxsat bermaydi).
 - **Bot orqali:** botga xabar yozing — 1-qator sarlavha, qolgani matn. Rasm + izoh yuborsangiz rasm muqova bo'ladi.
   Xabarni tahrirlasangiz sayt va kanal ham yangilanadi. Buyruqlar: `/list`, `/delete <slug>`, `/help`.
-- Bot faqat `ADMIN_TELEGRAM_ID` dagi foydalanuvchidan qabul qiladi.
+- Bot faqat `ADMIN_TELEGRAM_ID` dagi foydalanuvchidan qabul qiladi. Boshqalarga "Siz admin emassiz" deydi,
+  kim `/start` bosgani esa adminga xabar qilinadi.
+- **Alex xotirasi:** `/people` (eslab qolinganlar va oxirgi kommentatorlar ID bilan),
+  `/remember <id> <ma'lumot>`, `/forget <id>`. Alex shu odamning kommentiga shu ma'lumotga mos javob beradi.
+  Ma'lumotlar Firestore'ning `people` kolleksiyasida saqlanadi.
 - **Kommentlarga AI javob:** kanal postlari ostidagi kommentlarga bot Gemini yordamida post mazmuniga mos
   qisqa javob yozadi. Bot o'zini Alex deb tanishtiradi, muallifning o'z kommentlariga ham javob beradi.
   Bot javobiga reply qilinsa, suhbatni davom ettiradi. Odamlar orasidagi suhbatga va spamga javob bermaydi. Javob bot nomidan chiqadi.
